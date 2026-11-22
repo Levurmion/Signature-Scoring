@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { $match, signInWithGoogle, signOut, useAuth } from '@/lib/supabase/useAuth';
 
-export const AuthButton = () => {
+export const AuthSection = () => {
   const state = useAuth();
 
   return $match(state, {
