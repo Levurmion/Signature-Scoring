@@ -4,12 +4,13 @@
     "web": {
       "root": "frontend/",
       "framework": "vite",
-      "routes": [{ "handle": "filesystem" }, { "src": "/(.*)", "dest": "/index.html" }]
+      "routes": [{ "handle": "filesystem" }, { "src": "/(.*)", "dest": "/index.html" }],
+      "buildCommand": "pnpm run build-fe"
     },
     "api": {
       "root": "api/",
       "entrypoint": "src/index.ts",
-      "buildCommand": "pnpm run build"
+      "buildCommand": "pnpm run build-api"
     }
   },
   "rewrites": [

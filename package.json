@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "concurrently -k -n api,fe -c yellow,cyan \"pnpm --filter api dev\" \"pnpm --filter frontend dev\"",
     "build": "pnpm --filter api build && pnpm --filter frontend build",
+    "build-fe": "pnpm --filter frontend build",
+    "build-api": "pnpm --filter api build",
     "typecheck": "pnpm --filter api typecheck && pnpm --filter frontend typecheck",
     "test-fe": "pnpm --filter frontend test",
     "test-be": "pnpm --filter api test",
