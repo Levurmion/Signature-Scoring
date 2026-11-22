@@ -1,0 +1,44 @@
+---
+description: Comment discipline for app code — self-explanatory code over explanatory comments, tagged by author
+alwaysApply: true
+---
+
+# Comments: self-explanatory code, not explanatory comments
+
+In `frontend/src` and `api/src`, comments exist to let a human justify something the code
+genuinely can't express on its own — they are not a substitute for clear naming, types, and small
+functions. Never add a JSDoc to a utility or pure function just to restate its signature; if the
+name and types don't already make it obvious, rename or refactor instead of narrating it.
+
+## The two allowed cases
+
+1. **Human judgment calls** — a developer decided an explanation is load-bearing (the "why", not
+   the "what": a non-obvious tradeoff, a workaround, a deliberate deviation). Lead with `--human`.
+2. **External-system integration context** — a comment on an env var read or config value that
+   documents a constraint from an external system (required format, vendor quirk, quota) that
+   can't be inferred from the code. Lead with `--agent`.
+
+Every other comment — JSDoc on utility functions, restating what a line does, leftover TODOs —
+should not exist. As the agent, if a comment you're about to write doesn't fit case 2, don't write
+it: fix the code until it no longer needs one.
+
+```ts
+// --agent
+// Supabase rejects the service-role key here; this must stay the anon key.
+const supabaseKey = Config.redacted('SUPABASE_ANON_KEY');
+```
+
+```ts
+/**
+ * --human
+ * Retries 3x on purpose: upstream flakes under load, confirmed with the vendor on 2026-10-02.
+ */
+```
+
+## When touching existing code
+
+- An untagged comment is either stale AI narration (delete it) or something a human meant to keep
+  and forgot to tag. Don't assume either way — ask the user whether to delete it or tag it
+  `--human`.
+- Never delete a `--human`-tagged comment without asking first.
+- `--agent`-tagged comments may be freely refreshed or removed when the surrounding code changes.

@@ -8,11 +8,6 @@ export interface AuthState {
   readonly loading: boolean;
 }
 
-/**
- * Tracks the current Supabase session (set after a successful Google sign-in, cleared on sign-out
- * or expiry). `supabase-js` manages the session in `localStorage` and refreshes it automatically;
- * this hook just subscribes to changes so components can re-render.
- */
 export const useAuth = (): AuthState => {
   const [state, setState] = useState<AuthState>({ session: null, loading: true });
 
@@ -33,7 +28,6 @@ export const useAuth = (): AuthState => {
   return state;
 };
 
-/** Starts the Google OAuth redirect flow. Supabase sends the user to Google, then back here. */
 export const signInWithGoogle = () =>
   supabase.auth.signInWithOAuth({
     provider: 'google',

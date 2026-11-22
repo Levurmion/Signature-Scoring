@@ -3,6 +3,7 @@ import { HttpRouter, HttpServer } from 'effect/http';
 
 import { ApiLive } from './app.js';
 
+// --agent
 // Vercel's Node.js runtime looks for a default export with a `fetch(Request): Response` shape
 // (see https://vercel.com/docs/functions/runtimes/node-js). `HttpRouter.toWebHandler` builds
 // exactly that from the app's layer, using the generic (non-Node) default platform services since

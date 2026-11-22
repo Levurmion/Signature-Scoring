@@ -1,4 +1,5 @@
 /**
+ * --human
  * A minimal, dependency-free oxlint JS plugin (oxlint's JS plugin API is ESLint v9+ compatible)
  * that flags `throw` statements.
  *
