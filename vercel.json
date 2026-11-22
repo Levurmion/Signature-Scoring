@@ -8,7 +8,8 @@
     },
     "api": {
       "root": "api/",
-      "entrypoint": "src/index.ts"
+      "entrypoint": "src/index.ts",
+      "buildCommand": "pnpm run build"
     }
   },
   "rewrites": [
