@@ -18,7 +18,15 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "useUnknownInCatchVariables": true
+    "useUnknownInCatchVariables": true,
+
+    "paths": {
+      // kysely's package.json serves a stub `outdated-typescript.d.ts` (no `PostgresDialect`,
+      // etc.) to any TS version it detects as `<5.4` via a `types@<5.4` conditional export.
+      // TypeScript 7's native compiler misreports as outdated there, so point `kysely`'s types
+      // straight at the real declaration file. Runtime resolution (tsx/Node) is unaffected.
+      "kysely": ["./node_modules/kysely/dist/index.d.ts"]
+    }
   },
   "include": ["src", "scripts", "vitest.config.ts"]
 }
