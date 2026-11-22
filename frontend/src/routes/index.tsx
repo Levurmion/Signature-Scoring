@@ -4,16 +4,16 @@ import { Option } from 'effect';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { $api } from '@/lib/api/client';
-import { describeGreeting } from '@/lib/greeting';
+import { describeGreeting, error, loading, ready } from '@/lib/greeting';
 
 export const IndexPage = () => {
   const hello = $api.useQuery('get', '/api/hello');
 
   const greeting = hello.isPending
-    ? describeGreeting({ _tag: 'loading' })
+    ? describeGreeting(loading())
     : hello.isError
-      ? describeGreeting({ _tag: 'error', message: hello.error.message })
-      : describeGreeting({ _tag: 'ready', message: Option.fromUndefinedOr(hello.data?.message) });
+      ? describeGreeting(error({ message: hello.error.message }))
+      : describeGreeting(ready({ message: Option.fromUndefinedOr(hello.data?.message) }));
 
   return (
     <main className="flex min-h-svh flex-col items-center justify-center gap-6 p-6">
