@@ -24,7 +24,7 @@ export const IndexPage = () => {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <p className="text-sm">{greeting}</p>
-          <Button onClick={() => hello.refetch()} disabled={hello.isFetching}>
+          <Button onClick={() => void hello.refetch()} disabled={hello.isFetching}>
             Refetch
           </Button>
         </CardContent>
