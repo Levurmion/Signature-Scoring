@@ -9,6 +9,15 @@ vi.mock('@/lib/api/client', () => ({
   },
 }));
 
+// Avoid constructing a real `@supabase/supabase-js` client in unit tests: it requires env vars
+// that `.env.local` deliberately doesn't supply in Vitest's `test` mode, and a real client would
+// make network calls (`getSession`, `onAuthStateChange`) during render.
+vi.mock('@/lib/supabase/useAuth', () => ({
+  useAuth: () => ({ session: null, loading: false }),
+  signInWithGoogle: vi.fn(),
+  signOut: vi.fn(),
+}));
+
 const { IndexPage } = await import('./index.js');
 
 describe('IndexPage', () => {
