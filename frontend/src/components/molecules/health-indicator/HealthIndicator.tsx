@@ -1,12 +1,8 @@
 import { Spinner } from '@/components/ui/spinner';
+import { $api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
 
 import { $match, describeHealthState, healthState } from './health.js';
-
-interface HealthIndicatorProps {
-  readonly isFetching: boolean;
-  readonly isError: boolean;
-}
 
 const Dot = ({ className, label }: { readonly className: string; readonly label: string }) => (
   <output data-slot="health-indicator" className="inline-flex" title={label}>
@@ -15,13 +11,14 @@ const Dot = ({ className, label }: { readonly className: string; readonly label:
   </output>
 );
 
-export const HealthIndicator = ({ isFetching, isError }: HealthIndicatorProps) => {
-  const state = healthState({ isFetching, isError });
+export const HealthIndicator = () => {
+  const health = $api.useQuery('get', '/api/health', { pollingInterval: 10000 });
+  const state = healthState({ isFetching: health.isFetching, isError: health.isError });
   const label = describeHealthState(state);
 
   return $match(state, {
-    fetching: () => <Spinner data-slot="health-indicator" size="sm" title={label} />,
-    ok: () => <Dot className="bg-green-500 animate-pulse" label={label} />,
-    error: () => <Dot className="bg-destructive" label={label} />,
+    Fetching: () => <Spinner data-slot="health-indicator" size="sm" title={label} />,
+    Ok: () => <Dot className="bg-green-500 animate-pulse" label={label} />,
+    Error: () => <Dot className="bg-destructive" label={label} />,
   });
 };
