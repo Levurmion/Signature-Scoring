@@ -1,0 +1,32 @@
+{
+  "name": "signature-scoring",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n api,fe -c yellow,cyan \"pnpm --filter api dev\" \"pnpm --filter frontend dev\"",
+    "build": "pnpm --filter api build && pnpm --filter frontend build",
+    "typecheck": "pnpm --filter api typecheck && pnpm --filter frontend typecheck",
+    "test-fe": "pnpm --filter frontend test",
+    "test-be": "pnpm --filter api test",
+    "test": "pnpm run test-be && pnpm run test-fe",
+    "gen-api-types": "pnpm --filter api run gen-openapi && pnpm --filter frontend run gen-types",
+    "gen-db-types": "kysely-codegen --dialect postgres --env-file api/.env --include-pattern \"public.*\" --out-file api/src/db/types.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
+  },
+  "devDependencies": {
+    "concurrently": "10.0.7",
+    "kysely-codegen": "0.20.0",
+    "oxfmt": "0.79.0",
+    "oxlint": "1.94.0",
+    "oxlint-tsgolint": "7.0.2008",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@12.21.0"
+}

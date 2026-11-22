@@ -1,0 +1,57 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "plugins": ["typescript", "unicorn", "import", "react", "react-hooks", "jsx-a11y", "oxc"],
+  "jsPlugins": [{ "name": "local-functional", "specifier": "./tools/oxlint-no-throw.mjs" }],
+  "env": {
+    "builtin": true,
+    "es2024": true,
+    "node": true,
+    "browser": true
+  },
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    "local-functional/no-throw-statements": "error",
+    "typescript/no-explicit-any": "warn",
+    "import/no-cycle": "warn",
+    "import/no-unassigned-import": "off",
+    "react/react-in-jsx-scope": "off"
+  },
+  "ignorePatterns": [
+    "dist",
+    "build",
+    ".vercel",
+    "node_modules",
+    "**/routeTree.gen.ts",
+    "**/schema.d.ts",
+    "api/src/db/types.ts",
+    "api/openapi.json"
+  ],
+  "overrides": [
+    {
+      "files": ["**/*.config.{ts,js,mjs,cjs}", "**/vite.config.ts", "**/vitest.config.ts"],
+      "rules": {
+        "local-functional/no-throw-statements": "off"
+      }
+    },
+    {
+      "files": ["**/*.test.{ts,tsx}", "**/scripts/**", "**/src/db/types.ts"],
+      "rules": {
+        "local-functional/no-throw-statements": "off"
+      }
+    },
+    {
+      "files": ["**/components/ui/**"],
+      "rules": {
+        "local-functional/no-throw-statements": "off",
+        "typescript/no-explicit-any": "off"
+      }
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+---
+description: Functional programming conventions using Effect for frontend and backend app code
+alwaysApply: true
+---
+
+# Functional programming with Effect
+
+All app code in `frontend/src` and `api/src` must be written functionally, using
+[Effect](https://effect.website) (`effect` package) wherever it fits. This is enforced loosely by
+this rule and strictly for one case (`throw`) by oxlint's `local-functional/no-throw-statements`
+rule (a small local JS plugin at `tools/oxlint-no-throw.mjs` — `eslint-plugin-functional` itself
+can't load under TypeScript 7, see that file for why).
+
+## Rules for app code
+
+- No `throw`, `try`/`catch`, `let`, `for`/`while` loops, or in-place mutation (`push`, `splice`,
+  `obj.x =`). Use `const`, `Array`/`Record`/`Option`/`Either` combinators, and `readonly` types.
+- No classes, except service/error definitions that the Effect APIs require as classes:
+  `Schema.TaggedError`, `Effect.Service`, `Context.Tag`.
+- Prefer `pipe`/`Effect.gen` over nested `.then()` chains or imperative async/await blocks.
+- Model absence with `Option`, not `null`/`undefined` checks.
+- Model expected failures with schema-backed tagged errors (`Schema.TaggedError`, annotated with
+  `HttpApiSchema.status` for HTTP routes), not thrown exceptions. Track them in the `Effect` error
+  channel.
+- Get dependencies (DB, config, clients) through `Context`/`Layer`/`Effect.Service`, not module-level
+  singletons or constructors.
+- Read environment variables through `Config`/`Config.redacted`, not `process.env` directly.
+
+## The backend has (almost) no boundary to bridge
+
+Backend routes are defined with `effect/http-api` (`HttpApi`, `HttpApiEndpoint`, `HttpApiGroup`,
+`HttpApiBuilder`) and `effect/Schema` (not Zod, not Hono). A handler passed to
+`HttpApiBuilder.group(...).handle(...)` is already a plain Effect program:
+
+- On success, return the decoded value directly, e.g. `Effect.succeed({ message })`. No manual
+  `Response`/`c.json(...)` construction.
+- On a known failure, `Effect.fail(new SomeError({ ... }))` where `SomeError` is a
+  `Schema.TaggedError`. The endpoint's `error` schema (see `api/src/lib/errors.ts`) carries an
+  `HttpApiSchema.status(code)` annotation, and `HttpApi` encodes the failure into that response
+  automatically.
+
+There is no separate `runHandler`-style adapter to write per route: the only non-Effect code is the
+declarative `HttpApi`/`HttpApiEndpoint`/`HttpApiGroup` data describing routes and schemas, and the
+small amount of environment-specific wiring in `api/src/index.ts` (Vercel) and `api/src/server.ts`
+(local dev).
+
+## Allowed boundaries (pragmatic, non-Effect code is fine here)
+
+- The declarative `HttpApi` / `HttpApiEndpoint` / `HttpApiGroup` definitions (`api/src/api.ts`,
+  `api/src/routes/*.ts`): these describe routes and schemas as data, not Effect programs.
+- `api/src/index.ts` and `api/src/server.ts`: the environment-specific entrypoints that turn the
+  app's `Layer` into a Vercel-compatible `fetch` handler or a local Node server.
+- TanStack Query hooks (`useQuery`/`useMutation`) and the `openapi-fetch` client: these throw
+  internally and that is the accepted integration boundary. Don't wrap every call site in Effect.
+- React components and hooks: function components only (no classes), but ordinary JSX/hooks code,
+  not Effect generators.
+- Config files, build scripts, generated files (`schema.d.ts`, `db/types.ts`, `openapi.json`,
+  `routeTree.gen.ts`), and tests.
+
+## Examples
+
+```ts
+// BAD: backend route doing manual DB access + throw
+app.get('/widgets/:id', async (c) => {
+  const row = await db.selectFrom('widgets').where('id', '=', c.req.param('id')).executeTakeFirst();
+  if (!row) throw new Error('not found');
+  return c.json(row);
+});
+
+// GOOD: Effect program through the Db service, result/failure encoded by the schema
+HttpApiBuilder.group(Api, 'widgets', (handlers) =>
+  handlers.handle('getWidget', ({ path }) =>
+    pipe(
+      Db,
+      Effect.flatMap((db) => findWidget(db, path.id)),
+    ),
+  ),
+);
+```
+
+```ts
+// BAD: imperative loop + mutation
+const totals: number[] = [];
+for (const order of orders) {
+  totals.push(order.price * order.qty);
+}
+
+// GOOD: combinator pipeline
+const totals = orders.map((order) => order.price * order.qty);
+```

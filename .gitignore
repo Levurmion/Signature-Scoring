@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+build/
+.vercel/
+
+# env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Note: api/openapi.json, frontend/src/lib/api/schema.d.ts, api/src/db/types.ts
+# and frontend/src/routeTree.gen.ts are generated files, but are committed so
+# that `npm install && npm run typecheck` works without a live DB. Re-run
+# `npm run gen-api-types` / `npm run gen-db-types` after changing the contract.
+
+# logs
+npm-debug.log*
+*.log
+
+# editor / os
+.DS_Store
+*.swp
+
+# test / coverage
+coverage/
