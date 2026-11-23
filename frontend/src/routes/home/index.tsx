@@ -1,13 +1,14 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { Option } from 'effect';
 
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase/client';
 
 export const Route = createFileRoute('/home/')({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getSession();
 
-    return Option.match(Option.fromNullOr(data.session), {
+    Option.match(Option.fromNullOr(data.session), {
       onNone: () => redirect({ to: '/' }),
       onSome: () => undefined,
     });
@@ -16,5 +17,11 @@ export const Route = createFileRoute('/home/')({
 });
 
 function RouteComponent() {
-  return <></>;
+  return (
+    <Card>
+      <CardContent>
+        <p>Start</p>
+      </CardContent>
+    </Card>
+  );
 }

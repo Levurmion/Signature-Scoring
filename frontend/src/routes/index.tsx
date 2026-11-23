@@ -1,7 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { AuthSection } from '@/components/molecules/auth-section';
-
 export const Route = createFileRoute('/')({
-  component: () => <></>,
+  component: () => (
+    <div className="h-full w-full">
+      <p>Index</p>
+    </div>
+  ),
 });
