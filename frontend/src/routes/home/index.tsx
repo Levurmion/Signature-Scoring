@@ -1,7 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { Option } from 'effect';
 
-import { AuthSection } from '@/components/molecules/auth-section';
 import { supabase } from '@/lib/supabase/client';
 
 export const Route = createFileRoute('/home/')({
@@ -17,5 +16,5 @@ export const Route = createFileRoute('/home/')({
 });
 
 function RouteComponent() {
-  return <AuthSection />;
+  return <></>;
 }

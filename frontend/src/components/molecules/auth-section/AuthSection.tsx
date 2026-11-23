@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { $match, signInWithGoogle, signOut, useAuth } from '@/lib/supabase/useAuth';
+import { $match, signInWithGoogle, useAuth } from '@/lib/supabase/useAuth';
 
 export const AuthSection = () => {
   const state = useAuth();
@@ -9,9 +9,6 @@ export const AuthSection = () => {
     SignedIn: ({ session }) => (
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm">Signed in as {session.user.email}</p>
-        <Button variant="outline" onClick={() => void signOut()}>
-          Sign out
-        </Button>
       </div>
     ),
     SignedOut: () => (
