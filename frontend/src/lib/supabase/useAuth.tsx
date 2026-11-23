@@ -52,6 +52,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setState(authState(session));
+      void $match(authState(session), {
+        SignedIn: () => navigate({ to: '/home' }),
+        SignedOut: () => navigate({ to: '/' }),
+        Checking: () => undefined,
+      });
     });
 
     return () => {
