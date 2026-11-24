@@ -9,15 +9,71 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
 
+export type Json = JsonValue;
+
+export type JsonArray = JsonValue[];
+
+export type JsonObject = {
+  [x: string]: JsonValue | undefined;
+};
+
+export type JsonPrimitive = boolean | number | string | null;
+
+export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
+
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
-export interface Image {
-  created_at: Generated<Timestamp>;
+export interface DatasetQuestions {
+  dataset_id: number;
   id: Generated<number>;
-  item_id: string;
-  url: string;
+  question: Json;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface DocumentPersonMap {
+  document_id: number;
+  person_id: number;
+}
+
+export interface Documents {
+  id: Generated<number>;
+  meta: Json | null;
+  type: string;
+}
+
+export interface Persons {
+  id: Generated<number>;
+  name: string;
+}
+
+export interface Signatures {
+  document_id: number;
+  id: string;
+  image_url: string;
+  person_id: number | null;
+}
+
+export interface UserDatasets {
+  created_at: Generated<Timestamp | null>;
+  id: Generated<number>;
+  user_id: string;
+}
+
+export interface UserProfile {
+  age: number;
+  education: string;
+  first_language: string;
+  fluency: number;
+  name: string;
+  user_id: string;
 }
 
 export interface DB {
-  image: Image;
+  dataset_questions: DatasetQuestions;
+  document_person_map: DocumentPersonMap;
+  documents: Documents;
+  persons: Persons;
+  signatures: Signatures;
+  user_datasets: UserDatasets;
+  user_profile: UserProfile;
 }
