@@ -22,6 +22,18 @@
     "import/no-unassigned-import": "off",
     "react/react-in-jsx-scope": "off",
 
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "fix": {
+          "imports": "safe-fix",
+          "variables": "suggestion"
+        }
+      }
+    ],
+
     "typescript/no-explicit-any": "warn",
 
     "typescript/await-thenable": "error",
