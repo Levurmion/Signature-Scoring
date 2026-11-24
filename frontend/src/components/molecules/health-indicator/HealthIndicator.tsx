@@ -18,7 +18,7 @@ export const HealthIndicator = () => {
 
   return $match(state, {
     Fetching: () => <Spinner data-slot="health-indicator" size="sm" title={label} />,
-    Ok: () => <Dot className="bg-green-500 animate-pulse" label={label} />,
+    Ok: () => <Dot className="animate-pulse bg-green-500" label={label} />,
     Error: () => <Dot className="bg-destructive" label={label} />,
   });
 };

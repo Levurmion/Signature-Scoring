@@ -1,8 +1,8 @@
 import { Effect } from 'effect';
 import { HttpApiBuilder } from 'effect/http-api';
 
-import { Api } from './api.js';
-import { greet } from './routes/hello.js';
+import { Api } from './api';
+import { greet } from './routes/hello';
 
 export const MetaGroupLive = HttpApiBuilder.group(Api, 'meta', (handlers) =>
   handlers

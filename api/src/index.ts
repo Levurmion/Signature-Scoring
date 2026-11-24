@@ -1,7 +1,7 @@
 import { Layer } from 'effect';
 import { HttpRouter, HttpServer } from 'effect/http';
 
-import { ApiLive } from './app.js';
+import { ApiLive } from './app';
 
 // --agent
 // Vercel's Node.js runtime looks for a default export with a `fetch(Request): Response` shape

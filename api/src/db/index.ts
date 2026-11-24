@@ -2,7 +2,7 @@ import { Config, Context, Effect, Layer, Redacted } from 'effect';
 import { Kysely, PostgresDialect } from 'kysely';
 import { Pool } from 'pg';
 
-import type { DB } from './types.js';
+import type { DB } from './types';
 
 /**
  * --human

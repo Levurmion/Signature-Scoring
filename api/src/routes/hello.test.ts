@@ -3,7 +3,7 @@ import { Effect, Exit } from 'effect';
 import { expect } from 'vitest';
 
 import { ValidationError } from '../lib/errors.js';
-import { greet } from './hello.js';
+import { greet } from './hello';
 
 it.effect('greets a normal name', () =>
   Effect.gen(function* () {

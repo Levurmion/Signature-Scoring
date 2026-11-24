@@ -2,7 +2,7 @@ import { Layer } from 'effect';
 import { HttpRouter, HttpServer } from 'effect/http';
 import { afterAll, describe, expect, it } from 'vitest';
 
-import { ApiLive } from './app.js';
+import { ApiLive } from './app';
 
 const { handler, dispose } = HttpRouter.toWebHandler(
   ApiLive.pipe(Layer.provide(HttpServer.layerServices)),

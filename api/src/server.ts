@@ -4,7 +4,7 @@ import { NodeHttpServer, NodeRuntime } from '@effect/platform-node';
 import { Layer } from 'effect';
 import { HttpRouter } from 'effect/http';
 
-import { ApiLive } from './app.js';
+import { ApiLive } from './app';
 
 const port = Number(process.env.PORT ?? 8787);
 
