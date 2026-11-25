@@ -9,9 +9,7 @@
   "jsPlugins": [{ "name": "local-functional", "specifier": "./tools/oxlint-no-throw.mjs" }],
   "env": {
     "builtin": true,
-    "es2024": true,
-    "node": true,
-    "browser": true
+    "es2024": true
   },
   "options": {
     "typeAware": true
@@ -21,6 +19,7 @@
     "import/no-cycle": "warn",
     "import/no-unassigned-import": "off",
     "react/react-in-jsx-scope": "off",
+    "no-underscore-dangle": ["warn", { "allow": ["_tag"] }],
 
     "no-unused-vars": [
       "error",
@@ -62,13 +61,21 @@
   ],
   "overrides": [
     {
+      "files": ["api/**", "**/scripts/**", "**/*.config.{ts,js,mjs,cjs}"],
+      "env": { "node": true }
+    },
+    {
+      "files": ["frontend/src/**"],
+      "env": { "browser": true }
+    },
+    {
       "files": ["**/*.config.{ts,js,mjs,cjs}", "**/vite.config.ts", "**/vitest.config.ts"],
       "rules": {
         "local-functional/no-throw-statements": "off"
       }
     },
     {
-      "files": ["**/*.test.{ts,tsx}", "**/scripts/**", "**/src/db/types.ts"],
+      "files": ["**/*.test.{ts,tsx}", "**/scripts/**"],
       "rules": {
         "local-functional/no-throw-statements": "off",
         "typescript/no-unsafe-assignment": "off",

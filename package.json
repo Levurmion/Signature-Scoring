@@ -8,7 +8,7 @@
     "build": "pnpm --filter api build && pnpm --filter frontend build",
     "build-fe": "pnpm --filter frontend build",
     "build-api": "pnpm --filter api build",
-    "typecheck": "pnpm --filter api typecheck && pnpm --filter frontend typecheck",
+    "typecheck": "pnpm -r --no-bail run typecheck",
     "test-fe": "pnpm --filter frontend test",
     "test-be": "pnpm --filter api test",
     "test": "pnpm run test-be && pnpm run test-fe",
