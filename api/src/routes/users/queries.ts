@@ -1,11 +1,10 @@
 import { Effect, Option } from 'effect';
-import type { Kysely } from 'kysely';
 
-import type { DB } from '../../db/types';
+import type { KyselyDb } from '../../db';
 import { DbError } from '../../lib/errors';
 import type { SignUpRequest } from './definition';
 
-export const userProfileQuery = (kysely: Kysely<DB>, userId: string) =>
+export const userProfileQuery = (kysely: KyselyDb, userId: string) =>
   Effect.tryPromise({
     try: () =>
       kysely
@@ -19,7 +18,7 @@ export const userProfileQuery = (kysely: Kysely<DB>, userId: string) =>
       }),
   }).pipe(Effect.map(Option.fromNullishOr));
 
-export const createUserProfile = (kysely: Kysely<DB>, userId: string, payload: SignUpRequest) =>
+export const createUserProfile = (kysely: KyselyDb, userId: string, payload: SignUpRequest) =>
   Effect.tryPromise({
     try: () =>
       kysely

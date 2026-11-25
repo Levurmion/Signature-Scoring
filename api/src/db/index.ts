@@ -41,3 +41,5 @@ const make = Effect.gen(function* () {
  * closes.
  */
 export const DbLive = Layer.effect(Db, make);
+
+export type KyselyDb = Kysely<DB>;
