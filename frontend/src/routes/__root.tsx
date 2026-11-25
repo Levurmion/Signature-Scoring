@@ -16,7 +16,7 @@ export interface RouterContext {
 
 const RootComponent = () => (
   <AuthProvider>
-    <main className="m-6 mx-auto flex min-h-svh w-full max-w-xl flex-col items-center justify-center gap-6 p-6">
+    <main className="m-6 mx-auto flex min-h-svh w-full max-w-xl flex-col items-center justify-center gap-2 p-6">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between gap-2">

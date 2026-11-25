@@ -14,7 +14,9 @@ const REDIRECT_DELAY = 1000;
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const { data, error } = $api.useQuery('get', '/api/users/redirect');
+  const { data, error } = $api.useQuery('get', '/api/users/redirect', undefined, {
+    throwOnError: (err) => err._tag === 'DbError',
+  });
 
   useEffect(() => {
     if (data) {
@@ -45,10 +47,13 @@ function RouteComponent() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>You are signed in! Redirecting...</CardTitle>
+        <CardTitle>You are signed in!</CardTitle>
       </CardHeader>
-      <CardContent>
-        <Spinner />
+      <CardContent className="grid place-items-center">
+        <div className="flex items-center justify-center gap-2">
+          <Spinner />
+          <p>Redirecting...</p>
+        </div>
       </CardContent>
     </Card>
   );

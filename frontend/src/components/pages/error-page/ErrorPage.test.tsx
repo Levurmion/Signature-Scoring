@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import {
   createMemoryHistory,
   createRootRoute,
@@ -15,9 +16,14 @@ import { ErrorPage, RootErrorPage } from './ErrorPage';
 const renderApp = ({
   failRoot = () => false,
   failPage = () => false,
+  Page = () => {
+    if (failPage()) throw new Error('page exploded');
+    return <p>Page content</p>;
+  },
 }: {
   readonly failRoot?: () => boolean;
   readonly failPage?: () => boolean;
+  readonly Page?: () => React.ReactNode;
 }) => {
   const rootRoute = createRootRoute({
     component: () => {
@@ -34,17 +40,19 @@ const renderApp = ({
   const indexRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/',
-    component: () => {
-      if (failPage()) throw new Error('page exploded');
-      return <p>Page content</p>;
-    },
+    component: Page,
   });
   const router = createRouter({
     routeTree: rootRoute.addChildren([indexRoute]),
     history: createMemoryHistory({ initialEntries: ['/'] }),
     defaultErrorComponent: ErrorPage,
   });
-  return render(<RouterProvider router={router} />);
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  );
 };
 
 describe('ErrorPage', () => {
@@ -82,6 +90,25 @@ describe('ErrorPage', () => {
 
     expect(await screen.findByText('Page content')).toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('refetches a query that failed with throwOnError when Try again is pressed', async () => {
+    const fetchData = vi
+      .fn<() => Promise<string>>()
+      .mockRejectedValueOnce(new Error('query exploded'))
+      .mockResolvedValue('Query content');
+    renderApp({
+      Page: () => {
+        const { data } = useQuery({ queryKey: ['data'], queryFn: fetchData, throwOnError: true });
+        return <p>{data ?? 'Loading'}</p>;
+      },
+    });
+    expect(await screen.findByRole('alert')).toHaveTextContent('query exploded');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }));
+
+    expect(await screen.findByText('Query content')).toBeInTheDocument();
+    expect(fetchData).toHaveBeenCalledTimes(2);
   });
 
   it('links back to the start', async () => {
