@@ -32,7 +32,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setState(auth);
       void $match(auth, {
         SignedIn: () =>
-          router.state.location.pathname === '/' ? router.navigate({ to: '/home' }) : undefined,
+          router.state.location.pathname === '/'
+            ? router.navigate({ to: '/auth-redirect' })
+            : undefined,
         SignedOut: () => router.navigate({ to: '/' }),
         Checking: () => undefined,
       });

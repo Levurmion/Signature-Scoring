@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRedirectIndexRouteImport } from './routes/auth-redirect/index'
 import { Route as HomeIndexRouteImport } from './routes/home/index'
 import { Route as SignUpIndexRouteImport } from './routes/sign-up/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRedirectIndexRoute = AuthRedirectIndexRouteImport.update({
+  id: '/auth-redirect/',
+  path: '/auth-redirect/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HomeIndexRoute = HomeIndexRouteImport.update({
@@ -31,30 +37,34 @@ const SignUpIndexRoute = SignUpIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth-redirect/': typeof AuthRedirectIndexRoute
   '/home/': typeof HomeIndexRoute
   '/sign-up/': typeof SignUpIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth-redirect': typeof AuthRedirectIndexRoute
   '/home': typeof HomeIndexRoute
   '/sign-up': typeof SignUpIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth-redirect/': typeof AuthRedirectIndexRoute
   '/home/': typeof HomeIndexRoute
   '/sign-up/': typeof SignUpIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/home/' | '/sign-up/'
+  fullPaths: '/' | '/auth-redirect/' | '/home/' | '/sign-up/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/sign-up'
-  id: '__root__' | '/' | '/home/' | '/sign-up/'
+  to: '/' | '/auth-redirect' | '/home' | '/sign-up'
+  id: '__root__' | '/' | '/auth-redirect/' | '/home/' | '/sign-up/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRedirectIndexRoute: typeof AuthRedirectIndexRoute
   HomeIndexRoute: typeof HomeIndexRoute
   SignUpIndexRoute: typeof SignUpIndexRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth-redirect/': {
+      id: '/auth-redirect/'
+      path: '/auth-redirect'
+      fullPath: '/auth-redirect/'
+      preLoaderRoute: typeof AuthRedirectIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/home/': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRedirectIndexRoute: AuthRedirectIndexRoute,
   HomeIndexRoute: HomeIndexRoute,
   SignUpIndexRoute: SignUpIndexRoute,
 }
