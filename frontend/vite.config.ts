@@ -13,7 +13,11 @@ export default defineConfig({
       autoCodeSplitting: true,
       routeFileIgnorePattern: '\\.test\\.tsx$',
     }),
-    react(),
+    // --agent
+    // `compiler` runs React Compiler via `oxc-transform-react` (the plugin's experimental Rust
+    // port); `logDiagnostics` surfaces components it skips. Keep that package within the plugin's
+    // peer range (currently <0.157).
+    react({ compiler: { logDiagnostics: true } }),
     tailwindcss(),
   ],
   resolve: {
