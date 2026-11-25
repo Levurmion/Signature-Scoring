@@ -3,6 +3,7 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { Effect, Option, Schema } from 'effect';
 import { useForm } from 'react-hook-form';
 
+import { NumberInput } from '@/components/reui/number-field';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -45,34 +46,30 @@ export const Route = createFileRoute('/sign-up/')({
   component: RouteComponent,
 });
 
-const requiredText = (message: string) =>
-  Schema.String.check(Schema.isTrimmed({ message }), Schema.isNonEmpty({ message }));
-
-const nonNegativeInteger = (message: string) =>
-  Schema.String.check(Schema.isPattern(/^\d+$/, { message }));
+const requiredString = (message: string) =>
+  Schema.String.annotate({ message })
+    .annotateKey({ messageMissingKey: message })
+    .check(Schema.isTrimmed({ message }), Schema.isNonEmpty({ message }));
 
 const SignUpFormSchema = Schema.Struct({
-  name: requiredText('Name is required'),
-  age: nonNegativeInteger('Age must be a whole number'),
-  education: requiredText('Education is required'),
-  first_language: requiredText('First language is required'),
-  fluency: nonNegativeInteger('Fluency must be a whole number'),
+  name: requiredString('Name is required'),
+  age: Schema.Number.annotate({ message: 'You must be at least 18' })
+    .annotateKey({ messageMissingKey: 'You must be at least 18' })
+    .check(
+      Schema.isGreaterThanOrEqualTo(18, { message: 'You must be at least 18' }),
+      Schema.isLessThanOrEqualTo(100, { message: 'Age cannot exceed 100' }),
+    ),
+  education: requiredString('Education is required'),
+  first_language: requiredString('First language is required'),
+  fluency: Schema.Literals([1, 2, 3, 4, 5]),
 });
 type SignUpFormValues = typeof SignUpFormSchema.Type;
-
-const defaultValues: SignUpFormValues = {
-  name: '',
-  age: '',
-  education: '',
-  first_language: '',
-  fluency: '',
-};
 
 function RouteComponent() {
   const navigate = useNavigate();
   const form = useForm<SignUpFormValues>({
     resolver: effectTsResolver(SignUpFormSchema),
-    defaultValues,
+    mode: 'onBlur',
   });
   const signUp = $api.useMutation('post', '/api/users/sign-up', {
     onSuccess: () => navigate({ to: '/home' }),
@@ -82,10 +79,10 @@ function RouteComponent() {
     signUp.mutate({
       body: {
         name: values.name,
-        age: Number(values.age),
+        age: values.age,
         education: values.education,
         first_language: values.first_language,
-        fluency: Number(values.fluency),
+        fluency: values.fluency,
       },
     });
 
@@ -117,10 +114,17 @@ function RouteComponent() {
               control={form.control}
               name="age"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="w-fit">
                   <FormLabel>Age</FormLabel>
                   <FormControl>
-                    <Input inputMode="numeric" {...field} />
+                    <NumberInput
+                      name={field.name}
+                      value={field.value ?? null}
+                      onBlur={field.onBlur}
+                      onValueChange={(value) => field.onChange(value)}
+                      min={0}
+                      step={1}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -131,7 +135,7 @@ function RouteComponent() {
               name="education"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Education</FormLabel>
+                  <FormLabel>Highest Level of Education</FormLabel>
                   <FormControl>
                     <Input inputMode="text" {...field} />
                   </FormControl>
