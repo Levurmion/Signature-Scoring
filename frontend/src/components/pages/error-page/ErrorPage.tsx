@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import { errorDetail } from './error.js';
+import { errorDetail } from './error';
 
 export const ErrorPage = ({
   error,

@@ -4,7 +4,7 @@ import createFetchClient, { type Middleware } from 'openapi-fetch';
 import createClient from 'openapi-react-query';
 
 import { supabase } from '../supabase/client';
-import type { paths } from './schema.js';
+import type { paths } from './schema';
 
 /**
  * --agent

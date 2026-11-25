@@ -2,7 +2,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { $api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
 
-import { $match, describeHealthState, healthState } from './health.js';
+import { $match, describeHealthState, healthState } from './health';
 
 const Dot = ({ className, label }: { readonly className: string; readonly label: string }) => (
   <output data-slot="health-indicator" className="inline-flex" title={label}>

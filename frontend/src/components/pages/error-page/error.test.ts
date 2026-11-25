@@ -1,7 +1,7 @@
 import { Option } from 'effect';
 import { describe, expect, it } from 'vitest';
 
-import { errorDetail } from './error.js';
+import { errorDetail } from './error';
 
 describe('errorDetail', () => {
   it('uses the message of an Error', () => {

@@ -2,7 +2,7 @@ import { writeFile } from 'node:fs/promises';
 
 import { OpenApi } from 'effect/http-api';
 
-import { Api } from '../src/api.js';
+import { Api } from '../src/api';
 
 const document = OpenApi.fromApi(Api);
 

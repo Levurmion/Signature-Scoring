@@ -1,1 +1,1 @@
-export { HealthIndicator } from './HealthIndicator.js';
+export { HealthIndicator } from './HealthIndicator';

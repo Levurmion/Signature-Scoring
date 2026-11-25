@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { describeHealthState, Error, Fetching, healthState, Ok } from './health.js';
+import { describeHealthState, Error, Fetching, healthState, Ok } from './health';
 
 describe('healthState', () => {
   it('is fetching while the query is in flight', () => {

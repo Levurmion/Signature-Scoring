@@ -1,7 +1,7 @@
 import type { Session } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
 
-import { authState, SignedIn, SignedOut } from './useAuth.js';
+import { authState, SignedIn, SignedOut } from './useAuth';
 
 const session = { user: { email: 'dr.hess@example.com' } } as Session;
 

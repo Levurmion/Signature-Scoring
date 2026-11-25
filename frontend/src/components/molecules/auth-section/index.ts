@@ -1,1 +1,1 @@
-export { AuthSection } from './AuthSection.js';
+export { AuthSection } from './AuthSection';
