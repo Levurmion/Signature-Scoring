@@ -1,11 +1,16 @@
 import { Layer } from 'effect';
 import { HttpRouter, HttpServer } from 'effect/http';
+import { HttpApiBuilder } from 'effect/http-api';
 import { afterAll, describe, expect, it } from 'vitest';
 
-import { ApiLive } from './app';
+import { Api } from './api';
+import { MetaGroupLive } from './handlers';
 
 const { handler, dispose } = HttpRouter.toWebHandler(
-  ApiLive.pipe(Layer.provide(HttpServer.layerServices)),
+  HttpApiBuilder.layer(Api, { openapiPath: '/api/doc' }).pipe(
+    Layer.provide(MetaGroupLive),
+    Layer.provide(HttpServer.layerServices),
+  ),
 );
 
 afterAll(() => dispose());

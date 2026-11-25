@@ -12,6 +12,7 @@
     "gen-openapi": "tsx scripts/export-openapi.ts"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.119.2",
     "effect": "4.1.5",
     "kysely": "0.29.9",
     "pg": "8.23.1"

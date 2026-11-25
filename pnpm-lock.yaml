@@ -29,6 +29,9 @@ importers:
 
   api:
     dependencies:
+      '@supabase/supabase-js':
+        specifier: 2.119.2
+        version: 2.119.2
       effect:
         specifier: 4.1.5
         version: 4.1.5

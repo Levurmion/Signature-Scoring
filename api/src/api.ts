@@ -2,6 +2,7 @@ import { HttpApi, HttpApiGroup, OpenApi } from 'effect/http-api';
 
 import { healthEndpoint } from './routes/health';
 import { helloEndpoint } from './routes/hello';
+import { usersApiGroup } from './routes/users';
 
 // --agent
 // Every endpoint is declared with a path relative to `/api` (e.g. `/health`) and then prefixed
@@ -15,4 +16,5 @@ export const Api = HttpApi.make('SignatureScoringApi')
     }),
   )
   .add(HttpApiGroup.make('meta').add(healthEndpoint).add(helloEndpoint))
+  .add(usersApiGroup)
   .prefix('/api');

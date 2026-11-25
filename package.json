@@ -13,7 +13,7 @@
     "test-be": "pnpm --filter api test",
     "test": "pnpm run test-be && pnpm run test-fe",
     "gen-api-types": "pnpm --filter api run gen-openapi && pnpm --filter frontend run gen-types",
-    "gen-db-types": "kysely-codegen --dialect postgres --env-file api/.env --include-pattern \"public.*\" --out-file api/src/db/types.ts",
+    "gen-db-types": "bash scripts/gen-db-types.sh",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
