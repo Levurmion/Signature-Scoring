@@ -9,12 +9,14 @@ import {
   ValidationErrorSchema,
 } from '../../lib/errors';
 
+const fluencySchema = Schema.Literals([1, 2, 3, 4, 5]);
+
 export const SignUpRequest = Schema.Struct({
+  name: Schema.String,
   age: Schema.Number,
   education: Schema.String,
   first_language: Schema.String,
-  fluency: Schema.Number,
-  name: Schema.String,
+  fluency: fluencySchema,
 });
 export type SignUpRequest = Schema.Schema.Type<typeof SignUpRequest>;
 

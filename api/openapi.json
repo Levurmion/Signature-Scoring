@@ -90,6 +90,9 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "name": {
+                      "type": "string"
+                    },
                     "age": {
                       "anyOf": [
                         {
@@ -112,33 +115,25 @@
                       "type": "string"
                     },
                     "fluency": {
-                      "anyOf": [
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "string",
-                          "enum": [
-                            "Infinity",
-                            "-Infinity",
-                            "NaN"
-                          ]
-                        }
+                      "type": "number",
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
                       ]
-                    },
-                    "name": {
-                      "type": "string"
                     },
                     "id": {
                       "type": "string"
                     }
                   },
                   "required": [
+                    "name",
                     "age",
                     "education",
                     "first_language",
                     "fluency",
-                    "name",
                     "id"
                   ],
                   "additionalProperties": false
@@ -199,6 +194,9 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "name": {
+                      "type": "string"
+                    },
                     "age": {
                       "anyOf": [
                         {
@@ -221,33 +219,25 @@
                       "type": "string"
                     },
                     "fluency": {
-                      "anyOf": [
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "string",
-                          "enum": [
-                            "Infinity",
-                            "-Infinity",
-                            "NaN"
-                          ]
-                        }
+                      "type": "number",
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
                       ]
-                    },
-                    "name": {
-                      "type": "string"
                     },
                     "id": {
                       "type": "string"
                     }
                   },
                   "required": [
+                    "name",
                     "age",
                     "education",
                     "first_language",
                     "fluency",
-                    "name",
                     "id"
                   ],
                   "additionalProperties": false
@@ -302,6 +292,9 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "name": {
+                    "type": "string"
+                  },
                   "age": {
                     "anyOf": [
                       {
@@ -324,30 +317,22 @@
                     "type": "string"
                   },
                   "fluency": {
-                    "anyOf": [
-                      {
-                        "type": "number"
-                      },
-                      {
-                        "type": "string",
-                        "enum": [
-                          "Infinity",
-                          "-Infinity",
-                          "NaN"
-                        ]
-                      }
+                    "type": "number",
+                    "enum": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      5
                     ]
-                  },
-                  "name": {
-                    "type": "string"
                   }
                 },
                 "required": [
+                  "name",
                   "age",
                   "education",
                   "first_language",
-                  "fluency",
-                  "name"
+                  "fluency"
                 ],
                 "additionalProperties": false
               }

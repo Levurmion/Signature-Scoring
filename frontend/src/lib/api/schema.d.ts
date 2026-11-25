@@ -179,11 +179,12 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        name: string;
                         age: number | ("Infinity" | "-Infinity" | "NaN");
                         education: string;
                         first_language: string;
-                        fluency: number | ("Infinity" | "-Infinity" | "NaN");
-                        name: string;
+                        /** @enum {number} */
+                        fluency: 1 | 2 | 3 | 4 | 5;
                         id: string;
                     };
                 };
@@ -227,11 +228,12 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    name: string;
                     age: number | ("Infinity" | "-Infinity" | "NaN");
                     education: string;
                     first_language: string;
-                    fluency: number | ("Infinity" | "-Infinity" | "NaN");
-                    name: string;
+                    /** @enum {number} */
+                    fluency: 1 | 2 | 3 | 4 | 5;
                 };
             };
         };
@@ -243,11 +245,12 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        name: string;
                         age: number | ("Infinity" | "-Infinity" | "NaN");
                         education: string;
                         first_language: string;
-                        fluency: number | ("Infinity" | "-Infinity" | "NaN");
-                        name: string;
+                        /** @enum {number} */
+                        fluency: 1 | 2 | 3 | 4 | 5;
                         id: string;
                     };
                 };
