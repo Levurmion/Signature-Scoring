@@ -11,7 +11,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["meta.health"];
+        get: operations["health.health"];
         put?: never;
         post?: never;
         delete?: never;
@@ -27,7 +27,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["meta.hello"];
+        get: operations["hello.hello"];
         put?: never;
         post?: never;
         delete?: never;
@@ -112,7 +112,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    "meta.health": {
+    "health.health": {
         parameters: {
             query?: never;
             header?: never;
@@ -132,7 +132,7 @@ export interface operations {
             };
         };
     };
-    "meta.hello": {
+    "hello.hello": {
         parameters: {
             query?: {
                 name?: string;
@@ -237,7 +237,7 @@ export interface operations {
         };
         responses: {
             /** @description Success */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };

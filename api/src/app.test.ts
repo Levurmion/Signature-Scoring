@@ -1,14 +1,23 @@
 import { Layer } from 'effect';
 import { HttpRouter, HttpServer } from 'effect/http';
-import { HttpApiBuilder } from 'effect/http-api';
+import { HttpApi, HttpApiBuilder } from 'effect/http-api';
 import { afterAll, describe, expect, it } from 'vitest';
 
-import { Api } from './api';
-import { MetaGroupLive } from './handlers';
+import { HealthApiLive, healthApiGroup } from './routes/health';
+import { HelloApiLive, helloApiGroup } from './routes/hello';
+
+// --agent
+// Only the public groups, so the test needs no Db/Authentication layers. It reuses the real API's
+// identifier and `/api` prefix so the group handler layers (built against `Api`) plug in as-is.
+const TestApi = HttpApi.make('SignatureScoringApi')
+  .add(healthApiGroup)
+  .add(helloApiGroup)
+  .prefix('/api');
 
 const { handler, dispose } = HttpRouter.toWebHandler(
-  HttpApiBuilder.layer(Api, { openapiPath: '/api/doc' }).pipe(
-    Layer.provide(MetaGroupLive),
+  HttpApiBuilder.layer(TestApi).pipe(
+    Layer.provide(HealthApiLive),
+    Layer.provide(HelloApiLive),
     Layer.provide(HttpServer.layerServices),
   ),
 );

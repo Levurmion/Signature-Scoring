@@ -1,7 +1,7 @@
-import { HttpApi, HttpApiGroup, OpenApi } from 'effect/http-api';
+import { HttpApi, OpenApi } from 'effect/http-api';
 
-import { healthEndpoint } from './routes/health';
-import { helloEndpoint } from './routes/hello';
+import { healthApiGroup } from './routes/health/definition';
+import { helloApiGroup } from './routes/hello/definition';
 import { usersApiGroup } from './routes/users/definition';
 
 // --agent
@@ -15,6 +15,7 @@ export const Api = HttpApi.make('SignatureScoringApi')
       version: '0.0.0',
     }),
   )
-  .add(HttpApiGroup.make('meta').add(healthEndpoint).add(helloEndpoint))
+  .add(healthApiGroup)
+  .add(helloApiGroup)
   .add(usersApiGroup)
   .prefix('/api');

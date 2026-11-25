@@ -8,9 +8,9 @@
     "/api/health": {
       "get": {
         "tags": [
-          "meta"
+          "health"
         ],
-        "operationId": "meta.health",
+        "operationId": "health.health",
         "parameters": [],
         "security": [],
         "responses": {
@@ -30,9 +30,9 @@
     "/api/hello": {
       "get": {
         "tags": [
-          "meta"
+          "hello"
         ],
-        "operationId": "meta.hello",
+        "operationId": "hello.hello",
         "parameters": [
           {
             "name": "name",
@@ -192,7 +192,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "Success",
             "content": {
               "application/json": {
@@ -489,7 +489,10 @@
   "security": [],
   "tags": [
     {
-      "name": "meta"
+      "name": "health"
+    },
+    {
+      "name": "hello"
     },
     {
       "name": "users"
