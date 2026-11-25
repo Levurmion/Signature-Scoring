@@ -16,6 +16,7 @@ function RouteComponent() {
   const navigate = useNavigate();
   const { data, error } = $api.useQuery('get', '/api/users/redirect', undefined, {
     throwOnError: (err) => err._tag === 'DbError',
+    retry: false,
   });
 
   useEffect(() => {
