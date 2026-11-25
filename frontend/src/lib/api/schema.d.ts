@@ -36,13 +36,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/users/redirect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["users.redirect"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/sign-up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["users.sign-up"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        UnauthorizedErrorEncoded: {
+            /** @enum {string} */
+            _tag: "UnauthorizedError";
+            message: string;
+        };
+        DbErrorEncoded: {
+            /** @enum {string} */
+            _tag: "DbError";
+            message: string;
+        };
+        ConflictErrorEncoded: {
+            /** @enum {string} */
+            _tag: "ConflictError";
+        };
         ValidationErrorEncoded: {
             /** @enum {string} */
             _tag: "ValidationError";
+            message: string;
+        };
+        NotFoundErrorEncoded: {
+            /** @enum {string} */
+            _tag: "NotFoundError";
             message: string;
         };
         HelloResponse: {
@@ -102,12 +153,139 @@ export interface operations {
                 };
             };
             /** @description ValidationError */
-            400: {
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": components["schemas"]["ValidationErrorEncoded"];
+                };
+            };
+        };
+    };
+    "users.redirect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        age: number | ("Infinity" | "-Infinity" | "NaN");
+                        education: string;
+                        first_language: string;
+                        fluency: number | ("Infinity" | "-Infinity" | "NaN");
+                        name: string;
+                        id: string;
+                    };
+                };
+            };
+            /** @description UnauthorizedError */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedErrorEncoded"];
+                };
+            };
+            /** @description NotFoundError */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotFoundErrorEncoded"];
+                };
+            };
+            /** @description DbError */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DbErrorEncoded"];
+                };
+            };
+        };
+    };
+    "users.sign-up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    age: number | ("Infinity" | "-Infinity" | "NaN");
+                    education: string;
+                    first_language: string;
+                    fluency: number | ("Infinity" | "-Infinity" | "NaN");
+                    name: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        age: number | ("Infinity" | "-Infinity" | "NaN");
+                        education: string;
+                        first_language: string;
+                        fluency: number | ("Infinity" | "-Infinity" | "NaN");
+                        name: string;
+                        id: string;
+                    };
+                };
+            };
+            /** @description UnauthorizedError */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedErrorEncoded"];
+                };
+            };
+            /** @description ConflictError */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConflictErrorEncoded"];
+                };
+            };
+            /** @description ValidationError */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorEncoded"];
+                };
+            };
+            /** @description DbError */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DbErrorEncoded"];
                 };
             };
         };

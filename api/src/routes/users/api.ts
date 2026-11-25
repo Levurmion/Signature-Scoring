@@ -1,13 +1,13 @@
 import { Effect, Option } from 'effect';
 import { HttpApiBuilder } from 'effect/http-api';
 
+import { Api } from '../../api';
 import { CurrentSession } from '../../auth';
 import { Db } from '../../db';
 import { ConflictError, DbError, NotFoundError } from '../../lib/errors';
-import { usersApiDefinition } from './definition';
 import { SignUpRequest } from './definition';
 
-export const UsersApiLive = HttpApiBuilder.group(usersApiDefinition, 'users', (handlers) =>
+export const UsersApiLive = HttpApiBuilder.group(Api, 'users', (handlers) =>
   handlers
     .handle('redirect', () =>
       Effect.gen(function* () {

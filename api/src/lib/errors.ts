@@ -1,4 +1,4 @@
-import { Schema } from 'effect';
+import { Match, Schema } from 'effect';
 import { HttpApiSchema } from 'effect/http-api';
 
 export class ValidationError extends Schema.TaggedError<ValidationError>()('ValidationError', {
@@ -32,3 +32,24 @@ export class DbError extends Schema.TaggedError<DbError>()('DbError', {
   message: Schema.String,
 }) {}
 export const DbErrorSchema = DbError.pipe(HttpApiSchema.status(500));
+
+export const ApiError = Schema.Union([
+  ValidationError,
+  BadRequestError,
+  UnauthorizedError,
+  NotFoundError,
+  ConflictError,
+  DbError,
+]);
+export type ApiError = typeof ApiError.Type;
+
+export const decodeApiError = Schema.decodeUnknownOption(ApiError);
+
+export const isValidationError = Schema.is(ValidationError);
+export const isBadRequestError = Schema.is(BadRequestError);
+export const isUnauthorizedError = Schema.is(UnauthorizedError);
+export const isNotFoundError = Schema.is(NotFoundError);
+export const isConflictError = Schema.is(ConflictError);
+export const isDbError = Schema.is(DbError);
+
+export const apiErrorMatcher = Match.type<ApiError>();

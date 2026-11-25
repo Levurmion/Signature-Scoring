@@ -2,7 +2,7 @@ import { HttpApi, HttpApiGroup, OpenApi } from 'effect/http-api';
 
 import { healthEndpoint } from './routes/health';
 import { helloEndpoint } from './routes/hello';
-import { usersApiGroup } from './routes/users';
+import { usersApiGroup } from './routes/users/definition';
 
 // --agent
 // Every endpoint is declared with a path relative to `/api` (e.g. `/health`) and then prefixed

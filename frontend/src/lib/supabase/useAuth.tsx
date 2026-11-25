@@ -1,5 +1,5 @@
 import type { Session } from '@supabase/supabase-js';
-import { useNavigate } from '@tanstack/react-router';
+import { useRouter } from '@tanstack/react-router';
 import { Data, Effect, Option, pipe } from 'effect';
 import { createContext, useContext, useEffect, useState } from 'react';
 
@@ -24,46 +24,40 @@ const initialAuthState: AuthState = Checking();
 const AuthContext = createContext<AuthState | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [state, setState] = useState<AuthState>(initialAuthState);
 
   useEffect(() => {
+    const applyAuth = (auth: AuthState) => {
+      setState(auth);
+      void $match(auth, {
+        SignedIn: () =>
+          router.state.location.pathname === '/' ? router.navigate({ to: '/home' }) : undefined,
+        SignedOut: () => router.navigate({ to: '/' }),
+        Checking: () => undefined,
+      });
+    };
+
     const cancelInitialSession = Effect.runCallback(
       Effect.tryPromise({
         try: () => supabase.auth.getSession(),
         catch: (error) => error,
       }).pipe(
         Effect.map(({ data }) => authState(data.session)),
-        Effect.tap((auth) =>
-          Effect.sync(() => {
-            setState(auth);
-            void $match(auth, {
-              SignedIn: () => navigate({ to: '/home' }),
-              SignedOut: () => navigate({ to: '/' }),
-              Checking: () => undefined,
-            });
-          }),
-        ),
+        Effect.tap((auth) => Effect.sync(() => applyAuth(auth))),
         Effect.orDie,
       ),
     );
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setState(authState(session));
-      void $match(authState(session), {
-        SignedIn: () => navigate({ to: '/home' }),
-        SignedOut: () => navigate({ to: '/' }),
-        Checking: () => undefined,
-      });
-    });
+    } = supabase.auth.onAuthStateChange((_event, session) => applyAuth(authState(session)));
 
     return () => {
       cancelInitialSession();
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [router]);
 
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;
 };

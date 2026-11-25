@@ -9,8 +9,8 @@ import { UsersApiLive } from './routes/users';
 
 export const ApiLive = HttpApiBuilder.layer(Api, { openapiPath: '/api/doc' }).pipe(
   Layer.provide(MetaGroupLive),
-  Layer.provide(DbLive),
   Layer.provide(UsersApiLive),
+  Layer.provide(DbLive),
   Layer.provide(AuthenticationLive),
   Layer.provide(SupabaseLive),
 );

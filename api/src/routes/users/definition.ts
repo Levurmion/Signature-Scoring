@@ -1,5 +1,5 @@
 import { Schema } from 'effect';
-import { HttpApi, HttpApiEndpoint, HttpApiGroup } from 'effect/http-api';
+import { HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from 'effect/http-api';
 
 import { Authentication } from '../../auth';
 import {
@@ -27,17 +27,16 @@ export type SignUpResponse = Schema.Schema.Type<typeof SignUpResponse>;
 export const usersApiGroup = HttpApiGroup.make('users')
   .add(
     HttpApiEndpoint.get('redirect', '/redirect', {
-      success: SignUpResponse,
+      success: SignUpResponse.pipe(HttpApiSchema.status(200)),
       error: [NotFoundErrorSchema, DbErrorSchema],
     }),
   )
   .add(
     HttpApiEndpoint.post('sign-up', '/sign-up', {
       payload: SignUpRequest,
-      success: SignUpResponse,
+      success: SignUpResponse.pipe(HttpApiSchema.status(201)),
       error: [ValidationErrorSchema, ConflictErrorSchema, DbErrorSchema],
     }),
   )
-  .middleware(Authentication);
-
-export const usersApiDefinition = HttpApi.make('users').add(usersApiGroup);
+  .middleware(Authentication)
+  .prefix('/users');
