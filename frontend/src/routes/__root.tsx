@@ -23,7 +23,7 @@ const RootComponent = () => (
             <CardTitle>Signature Scoring</CardTitle>
             <HealthIndicator />
           </div>
-          <CardDescription>Dr C. Hess</CardDescription>
+          <CardDescription>Dr Christoph Hess</CardDescription>
         </CardHeader>
         <CardContent>
           <AuthSection />

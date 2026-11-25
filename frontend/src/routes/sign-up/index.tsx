@@ -68,14 +68,6 @@ const defaultValues: SignUpFormValues = {
   fluency: '',
 };
 
-const fields = [
-  { name: 'name', label: 'Name', inputMode: 'text' },
-  { name: 'age', label: 'Age', inputMode: 'numeric' },
-  { name: 'education', label: 'Education', inputMode: 'text' },
-  { name: 'first_language', label: 'First language', inputMode: 'text' },
-  { name: 'fluency', label: 'Fluency', inputMode: 'numeric' },
-] as const;
-
 function RouteComponent() {
   const navigate = useNavigate();
   const form = useForm<SignUpFormValues>({
@@ -108,22 +100,71 @@ function RouteComponent() {
             className="flex flex-col gap-4"
             onSubmit={(event) => void form.handleSubmit(onSubmit)(event)}
           >
-            {fields.map(({ name, label, inputMode }) => (
-              <FormField
-                key={name}
-                control={form.control}
-                name={name}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{label}</FormLabel>
-                    <FormControl>
-                      <Input inputMode={inputMode} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input inputMode="text" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="age"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Age</FormLabel>
+                  <FormControl>
+                    <Input inputMode="numeric" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="education"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Education</FormLabel>
+                  <FormControl>
+                    <Input inputMode="text" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="first_language"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>First language</FormLabel>
+                  <FormControl>
+                    <Input inputMode="text" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="fluency"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Fluency</FormLabel>
+                  <FormControl>
+                    <Input inputMode="numeric" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             {signUp.error ? (
               <p className="text-sm text-destructive">
                 {signUp.error._tag === 'ConflictError'
