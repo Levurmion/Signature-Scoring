@@ -45,9 +45,9 @@ describe('GET /api/hello', () => {
     expect(await res.json()).toStrictEqual({ message: 'Hello, Ada!' });
   });
 
-  it('rejects a reserved name with 400', async () => {
+  it('rejects a reserved name with 422', async () => {
     const res = await handler(new Request('http://localhost/api/hello?name=admin'));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(422);
     expect(await res.json()).toStrictEqual({
       _tag: 'ValidationError',
       message: '"admin" is a reserved name',
