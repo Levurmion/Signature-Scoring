@@ -1,8 +1,8 @@
-import { effectTsResolver } from '@hookform/resolvers/effect-ts';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
-import { Effect, Option, Schema } from 'effect';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { FirstLanguageCombobox } from '@/components/molecules/first-language-combobox';
 import { FluencySelect } from '@/components/molecules/fluency-select';
@@ -22,97 +22,81 @@ import { Input } from '@/components/ui/input';
 import { $api, fetchClient } from '@/lib/api/client';
 import { invalidateSession } from '@/lib/auth';
 
-const Provider = Schema.Literals(['email', 'google']);
-type Provider = typeof Provider.Type;
-const isProvider = Schema.is(Provider);
+const Provider = z.enum(['email', 'google']);
+type Provider = z.infer<typeof Provider>;
 
 export const Route = createFileRoute('/sign-up/')({
   // --agent
   // `google`: finishing a Google sign-in, so a session is required. `email`: creating the account
   // here, so the visitor is expected to be signed out. Anything else falls back to `google`.
   validateSearch: (search: Record<string, unknown>): { readonly provider: Provider } => ({
-    provider: isProvider(search['provider']) ? search['provider'] : 'google',
+    provider: Provider.catch('google').parse(search['provider']),
   }),
-  beforeLoad: ({ search }): Promise<void> =>
-    Effect.runPromise(
-      Effect.gen(function* () {
-        const result = yield* Effect.tryPromise({
-          try: () => fetchClient.GET('/api/users/redirect', { cache: 'reload' }),
-          catch: () => redirect({ to: '/' }),
-        });
+  beforeLoad: async ({ search }): Promise<void> => {
+    const result = await fetchClient
+      .GET('/api/users/redirect', { cache: 'reload' })
+      .catch(() => Promise.reject(redirect({ to: '/' })));
 
-        yield* Option.match(Option.fromNullishOr(result.data), {
-          onSome: () => Effect.fail(redirect({ to: '/home' })),
-          onNone: () => {
-            const tag = result.error?._tag;
-            if (tag === 'UnauthorizedError') {
-              return search.provider === 'email' ? Effect.void : Effect.fail(redirect({ to: '/' }));
-            }
-            // Signed in with Google but no profile yet: finish that sign-up instead.
-            return tag === 'NotFoundError' && search.provider === 'email'
-              ? Effect.fail(redirect({ to: '/sign-up', search: { provider: 'google' } }))
-              : Effect.void;
-          },
-        });
-      }),
-    ),
+    if (result.data) return Promise.reject(redirect({ to: '/home' }));
+
+    const tag = result.error?._tag;
+    if (tag === 'UnauthorizedError') {
+      return search.provider === 'email' ? undefined : Promise.reject(redirect({ to: '/' }));
+    }
+    // Signed in with Google but no profile yet: finish that sign-up instead.
+    return tag === 'NotFoundError' && search.provider === 'email'
+      ? Promise.reject(redirect({ to: '/sign-up', search: { provider: 'google' } }))
+      : undefined;
+  },
   component: RouteComponent,
 });
 
 const requiredString = (message: string) =>
-  Schema.String.annotate({ message })
-    .annotateKey({ messageMissingKey: message })
-    .check(Schema.isTrimmed({ message }), Schema.isNonEmpty({ message }));
+  z.string({ error: message }).trim().min(1, { error: message });
 
 const profileFields = {
   name: requiredString('Name is required'),
-  age: Schema.Number.annotate({ message: 'You must be at least 18' })
-    .annotateKey({ messageMissingKey: 'You must be at least 18' })
-    .check(
-      Schema.isGreaterThanOrEqualTo(18, { message: 'You must be at least 18' }),
-      Schema.isLessThanOrEqualTo(100, { message: 'Age cannot exceed 100' }),
-    ),
+  age: z
+    .number({ error: 'You must be at least 18' })
+    .min(18, { error: 'You must be at least 18' })
+    .max(100, { error: 'Age cannot exceed 100' }),
   education: requiredString('Education is required'),
   first_language: requiredString('First language is required'),
-  fluency: Schema.Literals([1, 2, 3, 4, 5])
-    .annotate({ message: 'Fluency is required' })
-    .annotateKey({ messageMissingKey: 'Fluency is required' }),
+  fluency: z.literal([1, 2, 3, 4, 5], { error: 'Fluency is required' }),
 };
 
 const emailMessage = 'Enter a valid email address';
 const passwordMessage = 'Password must be 8–72 characters';
 
 // --agent
-// Both schemas decode to the same shape so one form type serves both providers; only the email
+// Both schemas parse to the same shape so one form type serves both providers; only the email
 // flow validates the credential fields (the Google flow never renders or submits them).
-const SignUpFormSchema = Schema.Struct({
-  email: Schema.String,
-  password: Schema.String,
+const SignUpFormSchema = z.object({
+  email: z.string(),
+  password: z.string(),
   ...profileFields,
 });
-const EmailSignUpFormSchema = Schema.Struct({
-  email: Schema.String.annotate({ message: emailMessage })
-    .annotateKey({ messageMissingKey: emailMessage })
-    .check(Schema.isPattern(/^\s*[^\s@]+@[^\s@]+\.[^\s@]+\s*$/, { message: emailMessage })),
-  password: Schema.String.annotate({ message: passwordMessage })
-    .annotateKey({ messageMissingKey: passwordMessage })
-    .check(
-      Schema.isMinLength(8, { message: passwordMessage }),
-      Schema.isMaxLength(72, { message: passwordMessage }),
-    ),
+const EmailSignUpFormSchema = z.object({
+  email: z
+    .string({ error: emailMessage })
+    .trim()
+    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { error: emailMessage }),
+  password: z
+    .string({ error: passwordMessage })
+    .min(8, { error: passwordMessage })
+    .max(72, { error: passwordMessage }),
   ...profileFields,
 });
-type SignUpFormValues = typeof SignUpFormSchema.Type;
+type SignUpFormInput = z.input<typeof SignUpFormSchema>;
+type SignUpFormValues = z.output<typeof SignUpFormSchema>;
 
 function RouteComponent() {
   const { provider } = Route.useSearch();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const form = useForm<SignUpFormValues>({
+  const form = useForm<SignUpFormInput, unknown, SignUpFormValues>({
     resolver:
-      provider === 'email'
-        ? effectTsResolver(EmailSignUpFormSchema)
-        : effectTsResolver(SignUpFormSchema),
+      provider === 'email' ? zodResolver(EmailSignUpFormSchema) : zodResolver(SignUpFormSchema),
     defaultValues: { email: '', password: '' },
     mode: 'onBlur',
   });
@@ -135,25 +119,21 @@ function RouteComponent() {
 
   const onSubmit = ({ email, password, ...profile }: SignUpFormValues) =>
     provider === 'email'
-      ? emailSignUp.mutate({ body: { email: email.trim(), password, ...profile } })
+      ? emailSignUp.mutate({ body: { email, password, ...profile } })
       : googleSignUp.mutate({ body: profile });
 
   const isPending = googleSignUp.isPending || emailSignUp.isPending;
   // The email conflict is shown on the email field; everything else goes in the summary line.
-  const generalError = Option.match(
-    Option.fromNullishOr(provider === 'email' ? emailSignUp.error : googleSignUp.error),
-    {
-      onNone: () => null,
-      onSome: (error) =>
-        error._tag === 'ConflictError'
-          ? provider === 'email'
-            ? null
-            : 'You have already signed up.'
-          : 'message' in error
-            ? error.message
-            : 'Something went wrong. Please try again.',
-    },
-  );
+  const error = provider === 'email' ? emailSignUp.error : googleSignUp.error;
+  const generalError = !error
+    ? null
+    : error._tag === 'ConflictError'
+      ? provider === 'email'
+        ? null
+        : 'You have already signed up.'
+      : 'message' in error
+        ? error.message
+        : 'Something went wrong. Please try again.';
 
   return (
     <Card>

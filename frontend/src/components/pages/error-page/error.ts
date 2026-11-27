@@ -1,8 +1,5 @@
-import { Option, pipe, Predicate } from 'effect';
-
-export const errorDetail = (error: unknown): Option.Option<string> =>
-  pipe(
-    Option.liftPredicate(error, Predicate.isError),
-    Option.map((cause) => cause.message.trim()),
-    Option.filter((message) => message.length > 0),
-  );
+/** The trimmed message of a thrown `Error`, or `null` when there is nothing worth showing. */
+export const errorDetail = (error: unknown): string | null => {
+  const message = error instanceof Error ? error.message.trim() : '';
+  return message.length > 0 ? message : null;
+};

@@ -1,12 +1,13 @@
 ---
-description: Functional programming conventions using Effect for frontend and backend app code
+description: Functional programming conventions using Effect for backend app code, and plain TypeScript + Zod for the frontend
 alwaysApply: true
 ---
 
 # Functional programming with Effect
 
-All app code in `frontend/src` and `api/src` must be written functionally, using
-[Effect](https://effect.website) (`effect` package) wherever it fits. This is enforced loosely by
+All app code in `frontend/src` and `api/src` must be written functionally. `api/src` uses
+[Effect](https://effect.website) (`effect` package) wherever it fits; `frontend/src` does not use
+Effect at all (see "Frontend" below). This is enforced loosely by
 this rule and strictly for one case (`throw`) by oxlint's `local-functional/no-throw-statements`
 rule (a small local JS plugin at `tools/oxlint-no-throw.mjs` — `eslint-plugin-functional` itself
 can't load under TypeScript 7, see that file for why).
@@ -25,6 +26,22 @@ can't load under TypeScript 7, see that file for why).
 - Get dependencies (DB, config, clients) through `Context`/`Layer`/`Effect.Service`, not module-level
   singletons or constructors.
 - Read environment variables through `Config`/`Config.redacted`, not `process.env` directly.
+
+## Frontend
+
+The frontend does not depend on `effect`; it was too awkward to integrate with React. Instead:
+
+- Tagged unions are plain discriminated unions on `kind`
+  (`{ readonly kind: 'SignedIn'; readonly email: string } | ...`). A union whose variants carry no
+  data is just a union of string literals (`'Fetching' | 'Ok' | 'Error'`). Either way, match with a
+  `switch` whose `default` branch is `return assertNever(state)` (from `@/lib/assert`) so a missing
+  variant fails to type-check. (`_tag` in the frontend only appears on API error responses, which
+  come from the backend's Effect schemas.)
+- Absence is `null`/`undefined` with `??` / `?.`, not `Option`.
+- Schemas (forms, search params) are Zod (`zod`), with `zodResolver` for react-hook-form.
+- Route guards (`beforeLoad`) are plain `async` functions that `return Promise.reject(redirect(...))`.
+- `throw` is still banned; `panic` / `assertNever` in `@/lib/assert` are the only sanctioned throw
+  sites, for defects only.
 
 ## The backend has (almost) no boundary to bridge
 

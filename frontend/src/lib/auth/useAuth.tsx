@@ -1,17 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
-import { Data, Effect, Option, pipe } from 'effect';
 import { createContext, useContext, useEffect } from 'react';
+
+import { panic } from '@/lib/assert';
 
 import { sessionQueryOptions } from './session';
 
-export type AuthState = Data.TaggedEnum<{
-  readonly Checking: {};
-  readonly SignedIn: { readonly email: string };
-  readonly SignedOut: {};
-}>;
-
-export const { Checking, SignedIn, SignedOut, $match } = Data.taggedEnum<AuthState>();
+export type AuthState =
+  | { readonly kind: 'Checking' }
+  | { readonly kind: 'SignedIn'; readonly email: string }
+  | { readonly kind: 'SignedOut' };
 
 /**
  * --agent
@@ -24,13 +22,10 @@ export const authState = (query: {
   readonly data: { readonly email: string } | undefined;
 }): AuthState =>
   query.isPending
-    ? Checking()
-    : query.isError
-      ? SignedOut()
-      : Option.match(Option.fromNullishOr(query.data), {
-          onNone: SignedOut,
-          onSome: ({ email }) => SignedIn({ email }),
-        });
+    ? { kind: 'Checking' }
+    : query.isError || query.data === undefined
+      ? { kind: 'SignedOut' }
+      : { kind: 'SignedIn', email: query.data.email };
 
 /**
  * --agent
@@ -48,7 +43,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const state = authState(session);
   // --agent
   // `state` is a fresh object every render; redirect only when the signed-in status changes.
-  const status = state._tag;
+  const status = state.kind;
 
   useEffect(() => {
     const { pathname, search } = router.state.location;
@@ -64,13 +59,4 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const useAuth = (): AuthState =>
-  pipe(
-    useContext(AuthContext),
-    Option.fromNullOr,
-    Option.getOrElse(() =>
-      // --agent
-      // `throw` statements are banned by oxlint's no-throw-statements rule, so a
-      // missing-provider defect is raised via Effect's die/runSync instead.
-      Effect.runSync(Effect.die(new Error('useAuth must be used within an AuthProvider'))),
-    ),
-  );
+  useContext(AuthContext) ?? panic('useAuth must be used within an AuthProvider');

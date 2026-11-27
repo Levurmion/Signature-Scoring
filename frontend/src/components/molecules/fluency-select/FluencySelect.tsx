@@ -1,4 +1,3 @@
-import { Option } from 'effect';
 import type { ComponentProps } from 'react';
 
 import {
@@ -21,16 +20,8 @@ type FluencySelectProps = Omit<
   readonly name?: string;
 };
 
-const fluencyFromRaw = (raw: string): Option.Option<Fluency> =>
-  Option.fromNullishOr(FLUENCY_LEVELS.find((level) => String(level.value) === raw)).pipe(
-    Option.map((level) => level.value),
-  );
-
-const selectedValue = (value: Fluency | null): string =>
-  Option.match(Option.fromNullishOr(value), {
-    onNone: () => '',
-    onSome: (fluency) => String(fluency),
-  });
+const fluencyFromRaw = (raw: string): Fluency | undefined =>
+  FLUENCY_LEVELS.find((level) => String(level.value) === raw)?.value;
 
 export const FluencySelect = ({
   value,
@@ -41,12 +32,10 @@ export const FluencySelect = ({
 }: FluencySelectProps) => (
   <Select
     name={name}
-    value={selectedValue(value)}
+    value={value === null ? '' : String(value)}
     onValueChange={(raw) => {
-      Option.match(fluencyFromRaw(raw), {
-        onNone: () => undefined,
-        onSome: onValueChange,
-      });
+      const fluency = fluencyFromRaw(raw);
+      if (fluency !== undefined) onValueChange(fluency);
     }}
   >
     <SelectTrigger className={cn('w-full', className)} {...triggerProps}>

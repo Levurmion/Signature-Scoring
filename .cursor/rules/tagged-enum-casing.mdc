@@ -5,8 +5,9 @@ alwaysApply: true
 
 # Tagged enum variant casing
 
-In `frontend/src` and `api/src`, every `Data.TaggedEnum`/`Data.taggedEnum` variant tag must be
-PascalCase, not camelCase. This matches the `_tag` convention used elsewhere in `effect`
+In `frontend/src` and `api/src`, every tagged-union variant tag must be PascalCase, not camelCase:
+`Data.TaggedEnum`/`Data.taggedEnum` in `api/src`, and in `frontend/src` both the `kind` of a
+discriminated union and the members of a string-literal union. This matches the `_tag` convention used elsewhere in `effect`
 (`Schema.TaggedError`, `Option.Some`/`Option.None`, `Either.Left`/`Either.Right`).
 
 The constructors destructured from `Data.taggedEnum(...)` keep the same PascalCase names, and

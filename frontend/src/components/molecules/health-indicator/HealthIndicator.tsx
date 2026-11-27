@@ -1,8 +1,9 @@
 import { Spinner } from '@/components/ui/spinner';
 import { $api } from '@/lib/api/client';
+import { assertNever } from '@/lib/assert';
 import { cn } from '@/lib/utils';
 
-import { $match, describeHealthState, healthState } from './health';
+import { describeHealthState, healthState } from './health';
 
 const Dot = ({ className, label }: { readonly className: string; readonly label: string }) => (
   <output data-slot="health-indicator" className="inline-flex" title={label}>
@@ -16,9 +17,14 @@ export const HealthIndicator = () => {
   const state = healthState({ isFetching: health.isFetching, isError: health.isError });
   const label = describeHealthState(state);
 
-  return $match(state, {
-    Fetching: () => <Spinner data-slot="health-indicator" size="sm" title={label} />,
-    Ok: () => <Dot className="animate-pulse bg-green-500" label={label} />,
-    Error: () => <Dot className="bg-destructive" label={label} />,
-  });
+  switch (state) {
+    case 'Fetching':
+      return <Spinner data-slot="health-indicator" size="sm" title={label} />;
+    case 'Ok':
+      return <Dot className="animate-pulse bg-green-500" label={label} />;
+    case 'Error':
+      return <Dot className="bg-destructive" label={label} />;
+    default:
+      return assertNever(state);
+  }
 };

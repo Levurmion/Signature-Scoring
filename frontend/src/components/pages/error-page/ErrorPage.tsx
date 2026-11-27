@@ -1,6 +1,5 @@
 import { useQueryClient, useQueryErrorResetBoundary } from '@tanstack/react-query';
 import { type ErrorComponentProps, Link, useRouter } from '@tanstack/react-router';
-import { Option } from 'effect';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +21,7 @@ export const ErrorPage = ({
   const router = useRouter();
   const queryErrors = useQueryErrorResetBoundary();
   const queryClient = useQueryClient();
-  const detail = Option.getOrNull(showDetail ? errorDetail(error) : Option.none());
+  const detail = showDetail ? errorDetail(error) : null;
 
   return (
     <Card role="alert" data-slot="error-page">
