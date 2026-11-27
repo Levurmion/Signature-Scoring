@@ -5,7 +5,7 @@ import { Api } from '../../api';
 import { CurrentSession } from '../../auth';
 import { Db } from '../../db';
 import { ConflictError, DbError, NotFoundError } from '../../lib/errors';
-import { createUserProfile, userProfileQuery } from './queries';
+import { createUserProfile, toSignUpResponse, userProfileQuery } from './queries';
 
 // --agent
 // `Db` is read once while the group layer is built, not inside each handler: a service a handler
@@ -21,7 +21,7 @@ export const UsersApiLive = HttpApiBuilder.group(Api, 'users', (handlers) =>
           const maybeUserProfile = yield* userProfileQuery(kysely, user.id);
           return yield* Option.match(maybeUserProfile, {
             onNone: () => Effect.fail(new NotFoundError({ message: 'User profile not found' })),
-            onSome: ({ user_id, ...profile }) => Effect.succeed({ ...profile, id: user_id }),
+            onSome: toSignUpResponse,
           });
         }),
       )
@@ -35,7 +35,7 @@ export const UsersApiLive = HttpApiBuilder.group(Api, 'users', (handlers) =>
           });
           return yield* Option.match(maybeNewUserProfile, {
             onNone: () => Effect.fail(new DbError({ message: 'Failed to create user profile' })),
-            onSome: ({ user_id, ...profile }) => Effect.succeed({ ...profile, id: user_id }),
+            onSome: toSignUpResponse,
           });
         }),
       );

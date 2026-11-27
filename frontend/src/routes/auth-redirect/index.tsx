@@ -37,7 +37,7 @@ function RouteComponent() {
         }
         case 'NotFoundError': {
           setTimeout(() => {
-            void navigate({ to: '/sign-up' });
+            void navigate({ to: '/sign-up', search: { provider: 'google' } });
           }, REDIRECT_DELAY);
           break;
         }

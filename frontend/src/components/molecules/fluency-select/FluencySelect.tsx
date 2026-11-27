@@ -1,5 +1,5 @@
-import type { ComponentProps } from 'react';
 import { Option } from 'effect';
+import type { ComponentProps } from 'react';
 
 import {
   Select,

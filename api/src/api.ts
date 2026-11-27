@@ -1,5 +1,6 @@
 import { HttpApi, OpenApi } from 'effect/http-api';
 
+import { authApiGroup } from './routes/auth/definition';
 import { healthApiGroup } from './routes/health/definition';
 import { helloApiGroup } from './routes/hello/definition';
 import { usersApiGroup } from './routes/users/definition';
@@ -15,6 +16,7 @@ export const Api = HttpApi.make('SignatureScoringApi')
       version: '0.0.0',
     }),
   )
+  .add(authApiGroup)
   .add(healthApiGroup)
   .add(helloApiGroup)
   .add(usersApiGroup)

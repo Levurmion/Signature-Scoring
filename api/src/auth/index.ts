@@ -1,38 +1,24 @@
-import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js';
-import { Config, Context, Effect, Layer, Option, Redacted } from 'effect';
-import { HttpApiMiddleware, HttpApiSecurity } from 'effect/http-api';
+import type { User } from '@supabase/supabase-js';
+import { Context, Effect, Layer, Option } from 'effect';
+import { HttpApiMiddleware } from 'effect/http-api';
 
 import { UnauthorizedError, UnauthorizedErrorSchema } from '../lib/errors';
+import { makeServerClient, Supabase } from '../supabase';
 
-export class Supabase extends Context.Service<Supabase, { readonly client: SupabaseClient }>()(
-  'Supabase',
+export class CurrentSession extends Context.Service<CurrentSession, { readonly user: User }>()(
+  'CurrentSession',
 ) {}
 
-export const SupabaseLive = Layer.effect(
-  Supabase,
-  Effect.gen(function* () {
-    const url = yield* Config.String('SUPABASE_URL');
-    const anonKey = yield* Config.Redacted('SUPABASE_ANON_KEY');
-
-    return {
-      client: createClient(url, Redacted.value(anonKey), {
-        auth: { persistSession: false, autoRefreshToken: false },
-      }),
-    };
-  }),
-);
-
-export class CurrentSession extends Context.Service<
-  CurrentSession,
-  { readonly user: User; readonly accessToken: Redacted.Redacted }
->()('CurrentSession') {}
-
+/**
+ * --human
+ * Authenticates a request from its HttpOnly Supabase session cookies. Endpoints that need a signed-in
+ * user add this middleware and read the user from `CurrentSession`.
+ */
 export class Authentication extends HttpApiMiddleware.Service<
   Authentication,
   { provides: CurrentSession }
 >()('Authentication', {
   error: UnauthorizedErrorSchema,
-  security: { bearer: HttpApiSecurity.bearer },
 }) {}
 
 const unauthorized = (message: string) => new UnauthorizedError({ message });
@@ -40,22 +26,25 @@ const unauthorized = (message: string) => new UnauthorizedError({ message });
 export const AuthenticationLive = Layer.effect(
   Authentication,
   Effect.gen(function* () {
-    const { client } = yield* Effect.service(Supabase);
+    const supabase = yield* Supabase;
 
-    return Authentication.of({
-      bearer: (httpEffect, { credential }) =>
-        Effect.tryPromise({
-          try: () => client.auth.getUser(Redacted.value(credential)),
+    return Authentication.of((httpEffect) =>
+      Effect.gen(function* () {
+        const client = yield* makeServerClient.pipe(Effect.provideService(Supabase, supabase));
+        // --agent
+        // `getUser()` loads the session from the cookies, refreshes an expired access token with
+        // the refresh-token cookie (queuing the new cookies onto this response), then verifies the
+        // access token with Supabase rather than trusting the cookie's contents.
+        const { data, error } = yield* Effect.tryPromise({
+          try: () => client.auth.getUser(),
           catch: () => unauthorized('Unable to verify session'),
-        }).pipe(
-          Effect.flatMap(({ data, error }) =>
-            Option.match(Option.fromNullishOr(error ? null : data.user), {
-              onNone: () => Effect.fail(unauthorized('Invalid or expired session')),
-              onSome: (user) => Effect.succeed({ user, accessToken: credential }),
-            }),
-          ),
-          Effect.flatMap((session) => Effect.provideService(httpEffect, CurrentSession, session)),
-        ),
-    });
+        });
+        const user = yield* Option.match(Option.fromNullishOr(error ? null : data.user), {
+          onNone: () => Effect.fail(unauthorized('Invalid or expired session')),
+          onSome: Effect.succeed,
+        });
+        return yield* Effect.provideService(httpEffect, CurrentSession, { user });
+      }),
+    );
   }),
 );

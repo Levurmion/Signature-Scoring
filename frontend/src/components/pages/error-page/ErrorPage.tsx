@@ -1,4 +1,4 @@
-import { useQueryErrorResetBoundary } from '@tanstack/react-query';
+import { useQueryClient, useQueryErrorResetBoundary } from '@tanstack/react-query';
 import { type ErrorComponentProps, Link, useRouter } from '@tanstack/react-router';
 import { Option } from 'effect';
 
@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { supabase } from '@/lib/supabase/client';
+import { signOut } from '@/lib/auth';
 
 import { errorDetail } from './error';
 
@@ -21,6 +21,7 @@ export const ErrorPage = ({
 }: Pick<ErrorComponentProps, 'error'> & { readonly showDetail?: boolean }) => {
   const router = useRouter();
   const queryErrors = useQueryErrorResetBoundary();
+  const queryClient = useQueryClient();
   const detail = Option.getOrNull(showDetail ? errorDetail(error) : Option.none());
 
   return (
@@ -47,7 +48,7 @@ export const ErrorPage = ({
         >
           Try again
         </Button>
-        <Button variant="outline" asChild onClick={() => void supabase.auth.signOut()}>
+        <Button variant="outline" asChild onClick={() => void signOut(queryClient)}>
           <Link to="/">Go to start</Link>
         </Button>
       </CardFooter>

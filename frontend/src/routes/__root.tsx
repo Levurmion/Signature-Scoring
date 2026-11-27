@@ -1,14 +1,12 @@
 import { QueryClient } from '@tanstack/react-query';
-import { createRootRouteWithContext, Outlet, redirect } from '@tanstack/react-router';
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { Option, pipe } from 'effect';
 
 import { AuthSection } from '@/components/molecules/auth-section/AuthSection';
 import { HealthIndicator } from '@/components/molecules/health-indicator';
 import { RootErrorPage } from '@/components/pages/error-page';
 import { Card, CardDescription, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/lib/supabase/client';
-import { AuthProvider } from '@/lib/supabase/useAuth';
+import { AuthProvider } from '@/lib/auth';
 
 export interface RouterContext {
   readonly queryClient: QueryClient;
@@ -38,15 +36,4 @@ const RootComponent = () => (
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootComponent,
   errorComponent: RootErrorPage,
-  beforeLoad: async () => {
-    const { data } = await supabase.auth.getSession();
-    pipe(
-      data.session,
-      Option.fromNullOr,
-      Option.match({
-        onSome: () => void redirect({ to: '/home' }),
-        onNone: () => undefined,
-      }),
-    );
-  },
 });

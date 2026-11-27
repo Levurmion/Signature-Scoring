@@ -34,6 +34,10 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8787',
         changeOrigin: true,
+        // --agent
+        // Forward the browser's host/protocol (`x-forwarded-*`) so the API can build absolute URLs
+        // on the public origin, e.g. the Google OAuth callback, as it does behind Vercel.
+        xfwd: true,
       },
     },
   },

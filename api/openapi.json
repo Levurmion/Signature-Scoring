@@ -5,6 +5,266 @@
     "version": "0.0.0"
   },
   "paths": {
+    "/api/auth/session": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "auth.session",
+        "parameters": [],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "SessionResponse",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorEncoded"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/sign-out": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "auth.sign-out",
+        "parameters": [],
+        "security": [],
+        "responses": {
+          "204": {
+            "description": "<No Content>"
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorEncoded"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/google": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "auth.google",
+        "parameters": [],
+        "security": [],
+        "responses": {
+          "204": {
+            "description": "<No Content>"
+          }
+        }
+      }
+    },
+    "/api/auth/callback": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "auth.callback",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "security": [],
+        "responses": {
+          "204": {
+            "description": "<No Content>"
+          }
+        }
+      }
+    },
+    "/api/auth/sign-up": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "auth.sign-up",
+        "parameters": [],
+        "security": [],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "age": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "Infinity",
+                            "-Infinity",
+                            "NaN"
+                          ]
+                        }
+                      ]
+                    },
+                    "education": {
+                      "type": "string"
+                    },
+                    "first_language": {
+                      "type": "string"
+                    },
+                    "fluency": {
+                      "type": "number",
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "age",
+                    "education",
+                    "first_language",
+                    "fluency",
+                    "id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ConflictError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictErrorEncoded"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "ValidationError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorEncoded"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "DbError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbErrorEncoded"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 4,
+                    "maxLength": 72
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "age": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "Infinity",
+                          "-Infinity",
+                          "NaN"
+                        ]
+                      }
+                    ]
+                  },
+                  "education": {
+                    "type": "string"
+                  },
+                  "first_language": {
+                    "type": "string"
+                  },
+                  "fluency": {
+                    "type": "number",
+                    "enum": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      5
+                    ]
+                  }
+                },
+                "required": [
+                  "email",
+                  "password",
+                  "name",
+                  "age",
+                  "education",
+                  "first_language",
+                  "fluency"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "tags": [
@@ -77,11 +337,7 @@
         ],
         "operationId": "users.redirect",
         "parameters": [],
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
+        "security": [],
         "responses": {
           "200": {
             "description": "Success",
@@ -181,11 +437,7 @@
         ],
         "operationId": "users.sign-up",
         "parameters": [],
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
+        "security": [],
         "responses": {
           "201": {
             "description": "Success",
@@ -462,17 +714,27 @@
           "status"
         ],
         "additionalProperties": false
+      },
+      "SessionResponse": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "additionalProperties": false
       }
     },
-    "securitySchemes": {
-      "bearer": {
-        "type": "http",
-        "scheme": "Bearer"
-      }
-    }
+    "securitySchemes": {}
   },
   "security": [],
   "tags": [
+    {
+      "name": "auth"
+    },
     {
       "name": "health"
     },
