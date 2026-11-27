@@ -242,13 +242,13 @@ function NumberInput({
   return (
     <NumberField {...props}>
       {label !== undefined && <NumberFieldScrubArea label={label} />}
-      <NumberFieldGroup>
-        <NumberFieldInput className={cn('text-start', inputClassName)} />
-        <div className="m-px flex shrink-0 flex-col overflow-hidden rounded-lg border border-input bg-muted/30">
-          <NumberFieldIncrement className="flex h-3.5 w-full flex-1 shrink-0 items-center rounded-none! border-b border-input px-1.5 leading-none hover:bg-accent focus-visible:bg-accent">
+      <NumberFieldGroup className="h-9 rounded-md shadow-xs">
+        <NumberFieldInput className={cn('py-1 pr-2 pl-3 text-start', inputClassName)} />
+        <div className="m-px flex shrink-0 flex-col self-stretch overflow-hidden rounded-md border border-input bg-muted/30">
+          <NumberFieldIncrement className="flex min-h-0 w-full flex-1 items-center rounded-none! border-b border-input px-1.5 leading-none hover:bg-accent focus-visible:bg-accent">
             <ChevronUpIcon className="size-3.5" />
           </NumberFieldIncrement>
-          <NumberFieldDecrement className="flex h-3.5 w-full flex-1 shrink-0 items-center rounded-none! px-1.5 leading-none hover:bg-accent focus-visible:bg-accent">
+          <NumberFieldDecrement className="flex min-h-0 w-full flex-1 items-center rounded-none! px-1.5 leading-none hover:bg-accent focus-visible:bg-accent">
             <ChevronDownIcon className="size-3.5" />
           </NumberFieldDecrement>
         </div>

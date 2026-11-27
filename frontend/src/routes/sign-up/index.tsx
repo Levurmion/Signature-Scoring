@@ -3,6 +3,9 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { Effect, Option, Schema } from 'effect';
 import { useForm } from 'react-hook-form';
 
+import { FirstLanguageCombobox } from '@/components/molecules/first-language-combobox';
+import { FluencySelect } from '@/components/molecules/fluency-select';
+import { HighestLevelOfEducationCombobox } from '@/components/molecules/highest-level-of-education-combobox';
 import { NumberInput } from '@/components/reui/number-field';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,7 +64,9 @@ const SignUpFormSchema = Schema.Struct({
     ),
   education: requiredString('Education is required'),
   first_language: requiredString('First language is required'),
-  fluency: Schema.Literals([1, 2, 3, 4, 5]),
+  fluency: Schema.Literals([1, 2, 3, 4, 5])
+    .annotate({ message: 'Fluency is required' })
+    .annotateKey({ messageMissingKey: 'Fluency is required' }),
 });
 type SignUpFormValues = typeof SignUpFormSchema.Type;
 
@@ -110,26 +115,46 @@ function RouteComponent() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="age"
-              render={({ field }) => (
-                <FormItem className="w-fit">
-                  <FormLabel>Age</FormLabel>
-                  <FormControl>
-                    <NumberInput
-                      name={field.name}
-                      value={field.value ?? null}
-                      onBlur={field.onBlur}
-                      onValueChange={(value) => field.onChange(value)}
-                      min={0}
-                      step={1}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex w-full flex-row items-start gap-4">
+              <FormField
+                control={form.control}
+                name="age"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Age</FormLabel>
+                    <FormControl>
+                      <NumberInput
+                        name={field.name}
+                        value={field.value ?? null}
+                        onBlur={field.onBlur}
+                        onValueChange={(value) => field.onChange(value)}
+                        min={0}
+                        step={1}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="first_language"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>First language</FormLabel>
+                    <FormControl>
+                      <FirstLanguageCombobox
+                        name={field.name}
+                        value={field.value ?? null}
+                        onBlur={field.onBlur}
+                        onValueChange={(value) => field.onChange(value ?? '')}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name="education"
@@ -137,25 +162,18 @@ function RouteComponent() {
                 <FormItem>
                   <FormLabel>Highest Level of Education</FormLabel>
                   <FormControl>
-                    <Input inputMode="text" {...field} />
+                    <HighestLevelOfEducationCombobox
+                      name={field.name}
+                      value={field.value ?? null}
+                      onBlur={field.onBlur}
+                      onValueChange={(value) => field.onChange(value ?? '')}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="first_language"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>First language</FormLabel>
-                  <FormControl>
-                    <Input inputMode="text" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             <FormField
               control={form.control}
               name="fluency"
@@ -163,7 +181,12 @@ function RouteComponent() {
                 <FormItem>
                   <FormLabel>Fluency</FormLabel>
                   <FormControl>
-                    <Input inputMode="numeric" {...field} />
+                    <FluencySelect
+                      name={field.name}
+                      value={field.value ?? null}
+                      onBlur={field.onBlur}
+                      onValueChange={(value) => field.onChange(value)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
