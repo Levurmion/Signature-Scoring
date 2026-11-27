@@ -84,6 +84,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/sign-up/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["auth.google-sign-up"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/health": {
         parameters: {
             query?: never;
@@ -132,22 +148,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/users/sign-up": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["users.sign-up"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -162,18 +162,14 @@ export interface components {
             _tag: "DbError";
             message: string;
         };
-        ConflictErrorEncoded: {
+        NotFoundErrorEncoded: {
             /** @enum {string} */
-            _tag: "ConflictError";
+            _tag: "NotFoundError";
+            message: string;
         };
         ValidationErrorEncoded: {
             /** @enum {string} */
             _tag: "ValidationError";
-            message: string;
-        };
-        NotFoundErrorEncoded: {
-            /** @enum {string} */
-            _tag: "NotFoundError";
             message: string;
         };
         HelloResponse: {
@@ -182,6 +178,10 @@ export interface components {
         HealthResponse: {
             /** @enum {string} */
             status: "ok";
+        };
+        ConflictErrorEncoded: {
+            /** @enum {string} */
+            _tag: "ConflictError";
         };
         SessionResponse: {
             email: string;
@@ -357,6 +357,81 @@ export interface operations {
             };
         };
     };
+    "auth.google-sign-up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    age: number | ("Infinity" | "-Infinity" | "NaN");
+                    education: string;
+                    first_language: string;
+                    /** @enum {number} */
+                    fluency: 1 | 2 | 3 | 4 | 5;
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        name: string;
+                        age: number | ("Infinity" | "-Infinity" | "NaN");
+                        education: string;
+                        first_language: string;
+                        /** @enum {number} */
+                        fluency: 1 | 2 | 3 | 4 | 5;
+                        id: string;
+                    };
+                };
+            };
+            /** @description UnauthorizedError */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedErrorEncoded"];
+                };
+            };
+            /** @description ConflictError */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConflictErrorEncoded"];
+                };
+            };
+            /** @description ValidationError */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorEncoded"];
+                };
+            };
+            /** @description DbError */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DbErrorEncoded"];
+                };
+            };
+        };
+    };
     "health.health": {
         parameters: {
             query?: never;
@@ -450,81 +525,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NotFoundErrorEncoded"];
-                };
-            };
-            /** @description DbError */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DbErrorEncoded"];
-                };
-            };
-        };
-    };
-    "users.sign-up": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    name: string;
-                    age: number | ("Infinity" | "-Infinity" | "NaN");
-                    education: string;
-                    first_language: string;
-                    /** @enum {number} */
-                    fluency: 1 | 2 | 3 | 4 | 5;
-                };
-            };
-        };
-        responses: {
-            /** @description Success */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        name: string;
-                        age: number | ("Infinity" | "-Infinity" | "NaN");
-                        education: string;
-                        first_language: string;
-                        /** @enum {number} */
-                        fluency: 1 | 2 | 3 | 4 | 5;
-                        id: string;
-                    };
-                };
-            };
-            /** @description UnauthorizedError */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedErrorEncoded"];
-                };
-            };
-            /** @description ConflictError */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ConflictErrorEncoded"];
-                };
-            };
-            /** @description ValidationError */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ValidationErrorEncoded"];
                 };
             };
             /** @description DbError */

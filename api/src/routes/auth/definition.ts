@@ -38,8 +38,9 @@ export const EmailSignUpRequest = Schema.Struct({
 export type EmailSignUpRequest = Schema.Schema.Type<typeof EmailSignUpRequest>;
 
 // --agent
-// `middleware` only applies to endpoints already in the group, so the endpoints that need a signed-in
-// user come first and the public ones (starting a sign-in or sign-up) are added after it.
+// Group `middleware` only covers endpoints already in the group, so session and sign-out come
+// first and the public sign-in and email sign-up come after. Google profile sign-up sits beside
+// the email one and carries `Authentication` itself: that caller already has a session.
 export const authApiGroup = HttpApiGroup.make('auth')
   .add(
     HttpApiEndpoint.get('session', '/session', {
@@ -60,5 +61,12 @@ export const authApiGroup = HttpApiGroup.make('auth')
       success: SignUpResponse.pipe(HttpApiSchema.status(201)),
       error: [ValidationErrorSchema, ConflictErrorSchema, DbErrorSchema],
     }),
+  )
+  .add(
+    HttpApiEndpoint.post('google-sign-up', '/sign-up/google', {
+      payload: SignUpRequest,
+      success: SignUpResponse.pipe(HttpApiSchema.status(201)),
+      error: [ValidationErrorSchema, ConflictErrorSchema, DbErrorSchema],
+    }).middleware(Authentication),
   )
   .prefix('/auth');

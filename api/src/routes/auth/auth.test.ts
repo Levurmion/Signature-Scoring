@@ -17,7 +17,7 @@ import { AuthenticationLive } from '../../auth';
 import { Db } from '../../db';
 import type { DB } from '../../db/types';
 import { Supabase, SupabaseAdmin } from '../../supabase';
-import { fakeAuthServer } from '../../supabase/testing';
+import { fakeAuthServer, sessionCookie } from '../../supabase/testing';
 import { AuthApiLive, authApiGroup } from './index';
 
 const NEW_USER_ID = 'new-user';
@@ -36,6 +36,7 @@ const state = {
   existingEmails: new Set<string>(),
   createUserErrorCode: undefined as string | undefined,
   failProfileInsert: false,
+  profileExists: false,
   createdUsers: [] as Array<string>,
   deletedUsers: [] as Array<string>,
 };
@@ -44,6 +45,7 @@ beforeEach(() => {
   state.existingEmails = new Set();
   state.createUserErrorCode = undefined;
   state.failProfileInsert = false;
+  state.profileExists = false;
   state.createdUsers = [];
   state.deletedUsers = [];
 });
@@ -59,9 +61,15 @@ const respond = (query: CompiledQuery): Promise<QueryResult<unknown>> => {
     });
   }
   if (query.sql.startsWith('insert into "user_profile"')) {
+    const [userId] = query.parameters;
     return state.failProfileInsert
       ? Promise.reject(new Error('insert failed'))
-      : Promise.resolve({ rows: [{ user_id: NEW_USER_ID, ...profile }] });
+      : Promise.resolve({ rows: [{ user_id: String(userId), ...profile }] });
+  }
+  if (query.sql.includes('from "user_profile"')) {
+    return Promise.resolve({
+      rows: state.profileExists ? [{ user_id: authServer.user.id, ...profile }] : [],
+    });
   }
   return Promise.resolve({ rows: [] });
 };
@@ -196,6 +204,42 @@ describe('POST /api/auth/sign-up', () => {
 
     expect(res.status).toBe(500);
     expect(state.deletedUsers).toStrictEqual([NEW_USER_ID]);
+  });
+});
+
+const session = sessionCookie({ accessToken: authServer.validAccessToken });
+
+const googleSignUp = (body: Record<string, unknown>, cookie?: string) =>
+  handler(
+    new Request('http://localhost/api/auth/sign-up/google', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        ...(cookie === undefined ? {} : { cookie }),
+      },
+      body: JSON.stringify(body),
+    }),
+  );
+
+describe('POST /api/auth/sign-up/google', () => {
+  it('creates a profile for the signed-in user', async () => {
+    const res = await googleSignUp(profile, session);
+
+    expect(res.status).toBe(201);
+    expect(await res.json()).toStrictEqual({ ...profile, id: authServer.user.id });
+  });
+
+  it('is 401 without a session cookie', async () => {
+    expect((await googleSignUp(profile)).status).toBe(401);
+  });
+
+  it('returns 409 when that user already has a profile', async () => {
+    state.profileExists = true;
+
+    const res = await googleSignUp(profile, session);
+
+    expect(res.status).toBe(409);
+    expect(await res.json()).toStrictEqual({ _tag: 'ConflictError' });
   });
 });
 

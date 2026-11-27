@@ -2,12 +2,7 @@ import { Schema } from 'effect';
 import { HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from 'effect/http-api';
 
 import { Authentication } from '../../auth';
-import {
-  ConflictErrorSchema,
-  DbErrorSchema,
-  NotFoundErrorSchema,
-  ValidationErrorSchema,
-} from '../../lib/errors';
+import { DbErrorSchema, NotFoundErrorSchema } from '../../lib/errors';
 
 const fluencySchema = Schema.Literals([1, 2, 3, 4, 5]);
 
@@ -31,13 +26,6 @@ export const usersApiGroup = HttpApiGroup.make('users')
     HttpApiEndpoint.get('redirect', '/redirect', {
       success: SignUpResponse.pipe(HttpApiSchema.status(200)),
       error: [NotFoundErrorSchema, DbErrorSchema],
-    }),
-  )
-  .add(
-    HttpApiEndpoint.post('sign-up', '/sign-up', {
-      payload: SignUpRequest,
-      success: SignUpResponse.pipe(HttpApiSchema.status(201)),
-      error: [ValidationErrorSchema, ConflictErrorSchema, DbErrorSchema],
     }),
   )
   .middleware(Authentication)

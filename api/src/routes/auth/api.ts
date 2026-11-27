@@ -7,8 +7,12 @@ import { CurrentSession } from '../../auth';
 import { Db } from '../../db';
 import { ConflictError, DbError, ValidationError } from '../../lib/errors';
 import { makeServerClient, publicOrigin, Supabase, SupabaseAdmin } from '../../supabase';
-import { createUserProfile, toSignUpResponse } from '../users/queries';
-import { findAuthUserByEmail } from './queries';
+import {
+  createUserProfile,
+  findAuthUserByEmail,
+  toSignUpResponse,
+  userProfileQuery,
+} from './queries';
 
 const dbError = (message: string) => new DbError({ message });
 
@@ -121,6 +125,20 @@ export const AuthApiLive = HttpApiBuilder.group(Api, 'auth', (handlers) =>
 
             return response;
           }).pipe(Effect.tapError(() => deleteAuthUser(userId)));
+        }),
+      )
+      .handle('google-sign-up', ({ payload }) =>
+        Effect.gen(function* () {
+          const { user } = yield* Effect.service(CurrentSession);
+          const maybeUserProfile = yield* userProfileQuery(kysely, user.id);
+          const maybeNewUserProfile = yield* Option.match(maybeUserProfile, {
+            onSome: () => Effect.fail(new ConflictError()),
+            onNone: () => createUserProfile(kysely, user.id, payload),
+          });
+          return yield* Option.match(maybeNewUserProfile, {
+            onNone: () => Effect.fail(dbError('Failed to create user profile')),
+            onSome: toSignUpResponse,
+          });
         }),
       );
   }),

@@ -103,7 +103,9 @@ function RouteComponent() {
 
   const onSignedUp = () => invalidateSession(queryClient).then(() => navigate({ to: '/home' }));
 
-  const googleSignUp = $api.useMutation('post', '/api/users/sign-up', { onSuccess: onSignedUp });
+  const googleSignUp = $api.useMutation('post', '/api/auth/sign-up/google', {
+    onSuccess: onSignedUp,
+  });
   const emailSignUp = $api.useMutation('post', '/api/auth/sign-up', {
     onSuccess: onSignedUp,
     onError: (error) => {

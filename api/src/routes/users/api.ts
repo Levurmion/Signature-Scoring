@@ -4,8 +4,8 @@ import { HttpApiBuilder } from 'effect/http-api';
 import { Api } from '../../api';
 import { CurrentSession } from '../../auth';
 import { Db } from '../../db';
-import { ConflictError, DbError, NotFoundError } from '../../lib/errors';
-import { createUserProfile, toSignUpResponse, userProfileQuery } from './queries';
+import { NotFoundError } from '../../lib/errors';
+import { toSignUpResponse, userProfileQuery } from '../auth/queries';
 
 // --agent
 // `Db` is read once while the group layer is built, not inside each handler: a service a handler
@@ -14,30 +14,15 @@ import { createUserProfile, toSignUpResponse, userProfileQuery } from './queries
 export const UsersApiLive = HttpApiBuilder.group(Api, 'users', (handlers) =>
   Effect.gen(function* () {
     const { kysely } = yield* Db;
-    return handlers
-      .handle('redirect', () =>
-        Effect.gen(function* () {
-          const { user } = yield* Effect.service(CurrentSession);
-          const maybeUserProfile = yield* userProfileQuery(kysely, user.id);
-          return yield* Option.match(maybeUserProfile, {
-            onNone: () => Effect.fail(new NotFoundError({ message: 'User profile not found' })),
-            onSome: toSignUpResponse,
-          });
-        }),
-      )
-      .handle('sign-up', ({ payload }) =>
-        Effect.gen(function* () {
-          const { user } = yield* Effect.service(CurrentSession);
-          const maybeUserProfile = yield* userProfileQuery(kysely, user.id);
-          const maybeNewUserProfile = yield* Option.match(maybeUserProfile, {
-            onSome: () => Effect.fail(new ConflictError()),
-            onNone: () => createUserProfile(kysely, user.id, payload),
-          });
-          return yield* Option.match(maybeNewUserProfile, {
-            onNone: () => Effect.fail(new DbError({ message: 'Failed to create user profile' })),
-            onSome: toSignUpResponse,
-          });
-        }),
-      );
+    return handlers.handle('redirect', () =>
+      Effect.gen(function* () {
+        const { user } = yield* Effect.service(CurrentSession);
+        const maybeUserProfile = yield* userProfileQuery(kysely, user.id);
+        return yield* Option.match(maybeUserProfile, {
+          onNone: () => Effect.fail(new NotFoundError({ message: 'User profile not found' })),
+          onSome: toSignUpResponse,
+        });
+      }),
+    );
   }),
 );

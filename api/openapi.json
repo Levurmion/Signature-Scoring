@@ -265,6 +265,170 @@
         }
       }
     },
+    "/api/auth/sign-up/google": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "operationId": "auth.google-sign-up",
+        "parameters": [],
+        "security": [],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "age": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "Infinity",
+                            "-Infinity",
+                            "NaN"
+                          ]
+                        }
+                      ]
+                    },
+                    "education": {
+                      "type": "string"
+                    },
+                    "first_language": {
+                      "type": "string"
+                    },
+                    "fluency": {
+                      "type": "number",
+                      "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "age",
+                    "education",
+                    "first_language",
+                    "fluency",
+                    "id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorEncoded"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ConflictError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictErrorEncoded"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "ValidationError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorEncoded"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "DbError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbErrorEncoded"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "age": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "Infinity",
+                          "-Infinity",
+                          "NaN"
+                        ]
+                      }
+                    ]
+                  },
+                  "education": {
+                    "type": "string"
+                  },
+                  "first_language": {
+                    "type": "string"
+                  },
+                  "fluency": {
+                    "type": "number",
+                    "enum": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      5
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "age",
+                  "education",
+                  "first_language",
+                  "fluency"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "tags": [
@@ -429,170 +593,6 @@
           }
         }
       }
-    },
-    "/api/users/sign-up": {
-      "post": {
-        "tags": [
-          "users"
-        ],
-        "operationId": "users.sign-up",
-        "parameters": [],
-        "security": [],
-        "responses": {
-          "201": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string"
-                    },
-                    "age": {
-                      "anyOf": [
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "string",
-                          "enum": [
-                            "Infinity",
-                            "-Infinity",
-                            "NaN"
-                          ]
-                        }
-                      ]
-                    },
-                    "education": {
-                      "type": "string"
-                    },
-                    "first_language": {
-                      "type": "string"
-                    },
-                    "fluency": {
-                      "type": "number",
-                      "enum": [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5
-                      ]
-                    },
-                    "id": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "name",
-                    "age",
-                    "education",
-                    "first_language",
-                    "fluency",
-                    "id"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "UnauthorizedError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedErrorEncoded"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "ConflictError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConflictErrorEncoded"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "ValidationError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationErrorEncoded"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "DbError",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DbErrorEncoded"
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "age": {
-                    "anyOf": [
-                      {
-                        "type": "number"
-                      },
-                      {
-                        "type": "string",
-                        "enum": [
-                          "Infinity",
-                          "-Infinity",
-                          "NaN"
-                        ]
-                      }
-                    ]
-                  },
-                  "education": {
-                    "type": "string"
-                  },
-                  "first_language": {
-                    "type": "string"
-                  },
-                  "fluency": {
-                    "type": "number",
-                    "enum": [
-                      1,
-                      2,
-                      3,
-                      4,
-                      5
-                    ]
-                  }
-                },
-                "required": [
-                  "name",
-                  "age",
-                  "education",
-                  "first_language",
-                  "fluency"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
-          "required": true
-        }
-      }
     }
   },
   "components": {
@@ -635,28 +635,13 @@
         ],
         "additionalProperties": false
       },
-      "ConflictErrorEncoded": {
+      "NotFoundErrorEncoded": {
         "type": "object",
         "properties": {
           "_tag": {
             "type": "string",
             "enum": [
-              "ConflictError"
-            ]
-          }
-        },
-        "required": [
-          "_tag"
-        ],
-        "additionalProperties": false
-      },
-      "ValidationErrorEncoded": {
-        "type": "object",
-        "properties": {
-          "_tag": {
-            "type": "string",
-            "enum": [
-              "ValidationError"
+              "NotFoundError"
             ]
           },
           "message": {
@@ -669,13 +654,13 @@
         ],
         "additionalProperties": false
       },
-      "NotFoundErrorEncoded": {
+      "ValidationErrorEncoded": {
         "type": "object",
         "properties": {
           "_tag": {
             "type": "string",
             "enum": [
-              "NotFoundError"
+              "ValidationError"
             ]
           },
           "message": {
@@ -712,6 +697,21 @@
         },
         "required": [
           "status"
+        ],
+        "additionalProperties": false
+      },
+      "ConflictErrorEncoded": {
+        "type": "object",
+        "properties": {
+          "_tag": {
+            "type": "string",
+            "enum": [
+              "ConflictError"
+            ]
+          }
+        },
+        "required": [
+          "_tag"
         ],
         "additionalProperties": false
       },
